@@ -1,0 +1,52 @@
+# BSD-2-clause license, extended by language use conditions
+
+Copyright (C) 2024, Bertram Scharpf <software@bertram-scharpf.de>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+
+  * Redistributions must not contain any clauses about anticipated
+    harassment or discrimination, nor must they be held in a so-called
+    "inclusive language". As far as German language is used, the
+    conditions mentioned below additionally apply.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+## Use of the German Language
+
+Beim Gebrauch deutscher Sprache sind Weiterentwicklungen und
+-verbreitungen nur gestattet unter Einhaltung folgender
+zusätzlicher Bedingungen:
+
+  * Keine Verwendung von sogenannter „geschlechtergerechter Sprache“,
+    also Anfügen von weiblichen Endungen mit Binnen-I, Sternchen,
+    Doppelpunkt, Unterstrich oder ähnlichem, oder Konstruktionen, die
+    den Sachverhalt falsch wiedergeben („Radfahrende“, „Studierende“).
+
+  * Keine Verwendung der „reformierten Rechtschreibung“ von 1996,
+    insbesondere Doppel-S am Silbenende, „plazieren“ mit T, sowie
+    Großschreibung von Wendungen wie „des weiteren“.
+
+
+<!-- vim:set ft=markdown : -->

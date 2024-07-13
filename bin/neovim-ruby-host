@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+#
+#  bin/neovim-ruby-host  --  Child started by Neovim
+#
+
+require "neovim/host"
+
+
+module Neovim
+
+  class <<self
+
+    def plugin &block
+      require "neovim/vimscript_provider"
+      run_dsl DslVimscript, &block
+    end
+
+    private
+
+    def run_dsl dsl
+      @host or raise "Can't add plugins outside of a running session."
+      dsl.open @path, @host do |dsl|
+        yield dsl
+      end
+    end
+
+  end
+
+  if $*.delete "--version" then
+    puts [ Neovim::INFO.name, Neovim::INFO.version].join " "
+    exit
+  end
+
+  r = Host.run do |h|
+    begin
+      @host = h
+      $*.each do |p|
+        @path = p
+        Kernel.load @path, true
+      ensure
+        @path = nil
+      end
+    ensure
+      @host = nil
+    end
+  end
+  exit r.to_i
+
+end
+

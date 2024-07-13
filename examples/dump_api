@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+
+#
+#  dump_api  --  Dump NeoVim's API
+#
+
+$:.unshift "../lib"
+require "neovim/session"
+
+
+include Neovim
+
+
+USAGE = <<~EOT
+  #$0    | nvim - +'set ft=yaml' '+$'    # dump as YAML
+  #$0 -a | nvim - +'set ft=yaml' '+$'    # dump by "--api-info" option
+  #$0 -j | nvim - +'set ft=json' '+$'    # dump as JSON
+EOT
+
+
+class DumpApi
+
+  def get json: nil, alt: nil
+    if json then
+      as_json
+    else
+      if alt then
+        alternative_yaml
+      else
+        as_yaml
+      end
+    end
+  end
+
+  private
+
+  def api_info
+    Session.open ConnectionChild, "-u", "NONE", "-n" do |s|
+      ch, ai = s.request :nvim_get_api_info
+      ai
+    end
+  end
+
+  def as_json
+    require "json"
+    JSON.pretty_generate api_info
+  end
+
+  def as_yaml
+    require "yaml"
+    api_info.to_yaml
+  end
+
+  def alternative_yaml
+    require "neovim/foreign/mplight"
+    require "yaml"
+    t = MPLight::Types.new
+    t.extend MPLight::Unpacker
+    IO.popen %w(nvim --api-info) do |r|
+      t.init_input r
+      return t.get.to_yaml
+    end
+  end
+
+end
+
+if $*.delete '-h' then
+  puts USAGE
+  exit
+end
+
+output = DumpApi.new.get json: ($*.delete '-j'), alt: ($*.delete '-a')
+puts output
+

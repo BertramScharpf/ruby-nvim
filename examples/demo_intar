@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+#
+#  demo_intar  --  Start a Neovim session, attach to it and control it from an interactive Ruby
+#
+
+require "neovim/remote"
+require "intar"
+
+
+module Neovim
+
+  SOCKET = "/tmp/nvim-#$$.sock"
+
+  system *%W(tmux split-window -dv nvim --listen #{SOCKET})
+  sleep 1
+
+  Remote.start_client ConnectionUnix, SOCKET do |c|
+    c.command "set cuc cul"
+    c.set_option buftype: "nofile"
+    c.set_option :nu
+    b = c.get_current_buf
+    w = c.get_current_win
+    b[] = ["A".."Z", "a".."z", "0".."9"].map { |r| r.to_a }.flatten.map { |x| x*4 }
+    c.message "Hello from interactive Ruby!"
+    Intar.open do |i|
+      i.set_var :c, c
+      i.set_var :b, b
+      i.set_var :w, w
+      puts <<~EOT
+        # Example calls:
+          c.set_option_value "nu", false, {}
+          w.set_option :nu, :rnu
+          puts w.index
+          puts b[w.line]
+          b[w.line] += ["----"]
+          b.map! w.line do |x| x << "!" end
+      EOT
+      i.run
+    end
+    c.command "qa!"
+  rescue Messager::Disconnected
+    puts "done."
+  end
+
+end
+
