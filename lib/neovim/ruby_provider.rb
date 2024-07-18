@@ -304,7 +304,10 @@ module Neovim
           code = (get_lines client, fst..lst).join "\n"
           WriteBuf.redirect client do
             r = script_binding.eval code, "ruby_run"
-            r.nil? or puts "#=> #{r.inspect}"
+            unless r.nil? then
+              script_binding.local_variable_set :_, r
+              puts "#=> #{r.inspect}"
+            end
           end
         end
       elsif code == "+" then
