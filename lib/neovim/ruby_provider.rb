@@ -68,11 +68,15 @@ module Neovim
       nil
     end
     def puts *args
-      args.each { |a|
-        a = a.to_s
-        write a
-        write "\n" unless a.end_with? $/
-      }
+      if args.empty? then
+        write $/
+      else
+        args.each { |a|
+          a = a.to_s
+          write a
+          write $/ unless a.end_with? $/
+        }
+      end
       nil
     end
     def flush
@@ -147,7 +151,7 @@ module Neovim
       }
       s = s.split $/, -1
       @rest = s.pop
-      @client.put s, "l", true, false
+      @client.put s, "l", true, true
       nil
     end
     def finish
@@ -301,7 +305,7 @@ module Neovim
       if !code.notempty? or code == "|" then  # Workaround because Neovim doesn't allow empty code (the ultimate Quine)
         set_global_client client do
           client.command "#{lst}"
-          code = (get_lines client, fst..lst).join "\n"
+          code = (get_lines client, fst..lst).join $/
           WriteBuf.redirect client do
             r = script_binding.eval code, "ruby_run"
             r.nil? or puts "#=> #{r.inspect}"
