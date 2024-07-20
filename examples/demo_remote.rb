@@ -9,7 +9,7 @@ require "neovim"
 
 if $stdin.tty? then
   puts <<~EOT
-    # How to run this from inside Neovim:
+    " How to run this from inside Neovim:
     let chan = jobstart(['ruby','#$0'], { 'rpc': v:true })
     call rpcrequest(chan, 'rb_add', 7)
     call rpcrequest(chan, 'rb_raise')
