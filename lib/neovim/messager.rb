@@ -128,8 +128,7 @@ module Neovim
             e = [ 0, $!.to_s]
             log_exception :error
           end
-          rsp = Message::Response.new message.request_id, e, r
-          put rsp
+          put Message::Response[ message.request_id, e, r]
         when Message::Notification then
           begin
             @session.execute_handler message.method_name, message.arguments
