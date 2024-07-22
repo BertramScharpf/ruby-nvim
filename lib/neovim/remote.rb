@@ -26,7 +26,7 @@ module Neovim
     end
 
     def start
-      @conn.start @comm, client_name, self.class.name.downcase.to_sym, client_methods
+      @conn.start @comm, client_name, self.class.plain_name, client_methods
       @conn.client
     end
 

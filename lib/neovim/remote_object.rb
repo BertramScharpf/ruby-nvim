@@ -55,7 +55,7 @@ module Neovim
       end
 
       def type
-        @type ||= (name.sub /.*::/, "").to_sym
+        @type ||= plain_name.to_sym
       end
 
     end

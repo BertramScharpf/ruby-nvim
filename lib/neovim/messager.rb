@@ -38,14 +38,12 @@ module Neovim
       end
 
       def inspect
-        c = self.class.name.sub /.*::/, ""
-        "#<#{c} #@cont>"
+        "#<#{self.class.plain_name} #@cont>"
       end
 
       def to_s
-        c = self.class.name.sub /.*::/, ""
         j = @cont.map { |k,v| "#{k}:#{v}" if v }.compact.join ","
-        "#{c}(#{j})"
+        "#{self.class.plain_name}(#{j})"
       end
 
       def method_missing sym, *args

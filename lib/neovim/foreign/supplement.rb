@@ -14,6 +14,15 @@ rescue LoadError
   class FalseClass ; def to_bool ; false ; end ; end
   class Object     ; def to_bool ; true  ; end ; end
   class <<Struct ; alias [] new ; end
+  class Module
+    def plain_name
+      sep = "::"
+      n = name.dup
+      i = n.rindex sep
+      n.slice! 0, i+sep.length if i
+      n
+    end
+  end
   class String
     def axe n
       if n < length then

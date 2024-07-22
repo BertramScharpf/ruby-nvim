@@ -131,7 +131,7 @@ module Neovim
           (fields.delete :caller).to_s[ %r([^/]+:\d+)],
           (fields.delete :level),
           (fields.delete :message).inspect,
-          ((fields.delete :class).to_s.sub /.*::/, ""),
+          (fields.delete :class).plain_name,
           ((fields.map { |k,v| "#{k}:#{v}" }.join " ").axe 256),
         ]
         if @color then
