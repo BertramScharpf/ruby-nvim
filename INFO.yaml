@@ -3,7 +3,7 @@
 #
 
 nvim:
-  version: 1.0.0
+  version: 1.1.0
   license: BSD-2-Clause+
   authors:
     - Bertram Scharpf
@@ -14,5 +14,5 @@ nvim:
     A simple Ruby client for Neovim.
     Clean code, minimal dependecies, no frills, no wokeness.
 
-  homepage: http://bertram-scharpf.de
+  homepage: https://github.com/BertramScharpf/ruby-nvim
 
