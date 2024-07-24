@@ -120,7 +120,7 @@ module Neovim
           when Integer     then true
           else                  @file.tty?
           end
-        @short = short
+        @short, @maxlen = short, maxlen
       end
       COLORS = %w(33 32 34;1 4 31;1 35;1 36)
       def put **fields
@@ -132,7 +132,7 @@ module Neovim
           (fields.delete :level),
           (fields.delete :message).inspect,
           (fields.delete :class).plain_name,
-          ((fields.map { |k,v| "#{k}:#{v}" }.join " ").axe 256),
+          ((fields.map { |k,v| "#{k}:#{v}" }.join " ").axe @maxlen),
         ]
         if @color then
           l = l.zip COLORS
