@@ -39,7 +39,7 @@ module Neovim
       i.run
     end
     c.command "qa!"
-  rescue Messager::Disconnected
+  rescue Remote::Disconnected
     puts "done."
   end
 

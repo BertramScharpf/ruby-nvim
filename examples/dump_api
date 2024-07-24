@@ -5,7 +5,7 @@
 #
 
 $:.unshift "../lib"
-require "neovim/session"
+require "neovim/remote"
 
 
 include Neovim
@@ -35,7 +35,7 @@ class DumpApi
   private
 
   def api_info
-    Session.open ConnectionChild, "-u", "NONE", "-n" do |s|
+    Remote.open ConnectionChild, "-u", "NONE", "-n" do |s|
       ch, ai = s.request :nvim_get_api_info
       ai
     end

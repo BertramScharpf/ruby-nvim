@@ -31,7 +31,7 @@ module Neovim
     puts e.inspect
     sleep 1
     c.command "q"
-  rescue Messager::Disconnected
+  rescue Remote::Disconnected
     puts "done."
   end
 

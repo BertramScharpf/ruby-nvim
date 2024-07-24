@@ -111,7 +111,7 @@ module Neovim
 
     class Text < Stream
       NAME = "file"
-      def initialize file, color: nil, short: nil
+      def initialize file, color: nil, short: nil, maxlen: 256
         super
         @color =
           case color

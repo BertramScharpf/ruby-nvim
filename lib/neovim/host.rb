@@ -3,6 +3,7 @@
 #
 
 require "neovim/remote"
+require "neovim/handler"
 
 
 module Neovim
@@ -17,11 +18,30 @@ module Neovim
         end
       end
 
+      def run
+        $stdin.tty? and raise "This program expects to be called by Neovim. It can't run interactively."
+        Host.start do |h|
+          yield h
+          h.run
+          nil
+        rescue Remote::Disconnected
+          log :fatal, "Disconnected"
+          nil
+        rescue SignalException
+          n = $!.signm
+          log :fatal, "Signal was caught: #{n}"
+          (n =~ /\A(?:SIG)?TERM\z/) ? 0 : 1
+        rescue Exception
+          log_exception :fatal
+          2
+        end
+      end
+
     end
 
     def initialize conn
+      super
       @plugins = {}
-      super conn, @plugins
       DslPlain.open :base, self do |dsl|
         dsl.plain "poll" do
           start
@@ -43,27 +63,35 @@ module Neovim
       @plugins[ source] = plugins
     end
 
-    class <<self
 
-      def run
-        $stdin.tty? and raise "This program expects to be called by Neovim. It can't run interactively."
-        Host.start do |h|
-          yield h
-          h.run
-          nil
-        rescue Messager::Disconnected
-          log :fatal, "Disconnected"
-          nil
-        rescue SignalException
-          n = $!.signm
-          log :fatal, "Signal was caught: #{n}"
-          (n =~ /\A(?:SIG)?TERM\z/) ? 0 : 1
-        rescue Exception
-          log_exception :fatal
-          2
+    def client_name
+      types = @plugins.map { |_,p| p.type if p.type != :base }
+      types.uniq!
+      types.compact!
+      name = types.join "-"
+      log :info, "Client Name", name: name
+      "ruby-#{name}-host"
+    end
+
+    def client_methods
+      r = {}
+      @plugins[ :base].options { |name,opts| r[ name] = opts }
+      r
+    end
+
+
+    def execute_handler name, args
+      @plugins.each_value do |plugin|
+        handler = plugin.get_handler name
+        if handler then
+          log :info, "Found handler", name: name
+          log :debug1, "Calling with", args: args
+          return handler.execute @conn.client, *args
         end
       end
-
+      super
+    rescue NoHandlerError
+      raise NoHandlerError, "No handler found for #{name.inspect}."
     end
 
   end
