@@ -102,8 +102,8 @@ module Neovim
 
     include Logging
 
-    def initialize conn, session
-      @conn, @session = conn, session
+    def initialize conn, plugins
+      @conn, @plugins = conn, plugins
       @request_id = 0
       @responses = {}
     end
@@ -120,7 +120,7 @@ module Neovim
           end
         when Message::Request then
           begin
-            r = @session.execute_handler message.method_name, message.arguments
+            r = execute_handler message.method_name, message.arguments
             log :debug1, "Request result", result: r
           rescue
             e = [ 0, $!.to_s]
@@ -129,7 +129,7 @@ module Neovim
           put Message::Response[ message.request_id, e, r]
         when Message::Notification then
           begin
-            @session.execute_handler message.method_name, message.arguments
+            execute_handler message.method_name, message.arguments
           rescue
             log_exception :error
           end
@@ -174,6 +174,47 @@ module Neovim
       msg
     rescue EOFError
       raise Disconnected
+    end
+
+    def execute_handler name, args
+      @plugins or raise "This instance has no handlers (called: #{name.inspect})."
+      @plugins.each_value do |plugin|
+        handler = plugin.get_handler name
+        if handler then
+          log :info, "Found handler", name: name
+          log :debug1, "Calling with", args: args
+          return handler.execute @conn.client, *args
+        end
+      end
+      raise "No handler found for #{name.inspect}."
+    end
+
+    public
+
+    def client_name
+      if @plugins then
+        types = @plugins.map { |_,p| p.type if p.type != :base }
+        types.uniq!
+        types.compact!
+        name = types.join "-"
+        log :info, "Client Name", name: name
+        "ruby-#{name}-host"
+      else
+        "ruby-client"
+      end
+    end
+
+    def client_type
+      self.class.plain_name unless :TODO
+      @plugins ? :host : :remote
+    end
+
+    def client_methods
+      if @plugins then
+        r = {}
+        @plugins[ :base].options { |name,opts| r[ name] = opts }
+        r
+      end
     end
 
   end

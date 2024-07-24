@@ -19,13 +19,10 @@ module Neovim
 
     end
 
-    attr_reader :plugins
-
-    BASE = :base
-
     def initialize conn
-      super
-      DslPlain.open BASE, self do |dsl|
+      @plugins = {}
+      super conn, @plugins
+      DslPlain.open :base, self do |dsl|
         dsl.plain "poll" do
           start
           @plugins.each_value { |p| p.setup @conn.client }
@@ -42,21 +39,9 @@ module Neovim
       end
     end
 
-    def client_name
-      types = @plugins.map { |_,p| p.type if p.type != BASE }
-      types.uniq!
-      types.compact!
-      name = types.join "-"
-      log :info, "Client Name", name: name
-      "ruby-#{name}-host"
+    def add_plugins source, plugins
+      @plugins[ source] = plugins
     end
-
-    def client_methods
-      r = {}
-      @plugins[ BASE].options { |name,opts| r[ name] = opts }
-      r
-    end
-
 
     class <<self
 

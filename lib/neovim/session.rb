@@ -40,15 +40,10 @@ module Neovim
 
     end
 
-    def initialize conn
+    def initialize conn, plugins = nil
       @conn = conn
-      @comm = Messager.new @conn, self
+      @comm = Messager.new @conn, plugins
     end
-
-    def execute_handler name, args
-      raise "No handler found for #{name.inspect}."
-    end
-
 
     def run ; @comm.run ; end
     def request method, *args ; @comm.request method, *args ; end

@@ -33,8 +33,8 @@ module Neovim
     end
 
 
-    def start comm, client_name, client_type, client_methods = nil
-      comm.notify :nvim_set_client_info, client_name, Neovim::INFO.version_h, client_type, client_methods||{}, Neovim::INFO.attributes
+    def start comm
+      comm.notify :nvim_set_client_info, comm.client_name, Neovim::INFO.version_h, comm.client_type, comm.client_methods||{}, Neovim::INFO.attributes
       channel_id, api_info = *(comm.request :nvim_get_api_info)
       @client = Client.new comm, channel_id
       prefixes = {}
