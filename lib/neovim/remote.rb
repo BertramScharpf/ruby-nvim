@@ -82,7 +82,6 @@ module Neovim
             @cont[ :error] = [0, e]
           end
         end
-
       end
 
       class Notification < Message
@@ -161,7 +160,7 @@ module Neovim
           else
             log :warning, "Dropped response", message.request_id
           end
-        when Message::Request then
+        when Message::Request, Message::Notification then
           begin
             r = execute_handler message.method_name, message.arguments
             log :debug1, "Request result", result: r
@@ -169,12 +168,8 @@ module Neovim
             e = [ 0, $!.to_s]
             log_exception :error
           end
-          put Message::Response[ message.request_id, e, r]
-        when Message::Notification then
-          begin
-            execute_handler message.method_name, message.arguments
-          rescue
-            log_exception :error
+          if message.respond_to? :request_id then
+            put Message::Response[ message.request_id, e, r]
           end
         end
         break if until_id and @responses[ until_id]
