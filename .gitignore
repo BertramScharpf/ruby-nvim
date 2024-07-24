@@ -1,0 +1,6 @@
+#
+#  .gitignore  --  Do not check in these
+#
+
+lib/neovim/info.rb
+
