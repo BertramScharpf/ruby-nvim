@@ -131,7 +131,7 @@ module Neovim
           (fields.delete :caller).to_s[ %r([^/]+:\d+)],
           (fields.delete :level),
           (fields.delete :message).inspect,
-          (fields.delete :class).plain_name,
+          (fields.delete :selnder).class.plain_name,
           ((fields.map { |k,v| "#{k}:#{v}" }.join " ").axe @maxlen),
         ]
         if @color then
@@ -216,16 +216,16 @@ module Neovim
 
     def log level, message, **kwargs
       Logging.put level, message,
-        class: self.class, caller: (caller 1, 1).first,
+        sender: self, caller: (caller 1, 1).first,
         **kwargs
     end
 
     def log_exception level
       Logging.put level, "Exception: #$!",
-        class: self.class, caller: (caller 1, 1).first,
+        sender: self, caller: (caller 1, 1).first,
         exception: $!.class
       $@.each { |b|
-        Logging.put :debug3, "Backtrace", line: b
+        Logging.put :debug3, "Backtrace", sender: self, line: b
       }
       nil
     end
