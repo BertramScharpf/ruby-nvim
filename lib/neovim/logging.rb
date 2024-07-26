@@ -5,6 +5,15 @@
 require "neovim/foreign/supplement"
 
 
+class Object
+  def class_name
+    obj = self
+    while not obj.is_a? Module do obj = obj.class end
+    obj.plain_name
+  end
+end
+
+
 module Neovim
 
   module Logging
@@ -131,7 +140,7 @@ module Neovim
           (fields.delete :caller).to_s[ %r([^/]+:\d+)],
           (fields.delete :level),
           (fields.delete :message).inspect,
-          (fields.delete :selnder).class.plain_name,
+          (fields.delete :sender).class_name,
           ((fields.map { |k,v| "#{k}:#{v}" }.join " ").axe @maxlen),
         ]
         if @color then
