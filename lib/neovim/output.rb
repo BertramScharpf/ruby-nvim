@@ -99,21 +99,19 @@ module Neovim
   end
 
   class WriteBuf < WriteStd
+    def initialize *args
+      super
+      @lines = [""]
+    end
     def write *args
-      s = @rest||""
-      args.each { |a|
-        s << a
-      }
-      s = s.split $/, -1
-      @rest = s.pop
-      @client.put s, "l", true, true
+      s = @lines.pop
+      args.each { |a| s << a }
+      s.split $/, -1 do |l| @lines.push l end
       nil
     end
     def finish
-      if @rest.notempty? then
-        @client.put [@rest], "l", true, false
-        @rest = nil
-      end
+      @lines.last.notempty? or @lines.pop
+      @client.put @lines, "l", true, true
     end
   end
 
