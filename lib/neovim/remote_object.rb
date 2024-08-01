@@ -231,7 +231,7 @@ module Neovim
     def line_indices pos, len
       if Range === pos then
         r = pos
-        pos, lst = r.begin, r.end
+        pos, lst = r.begin||1, r.end||-1
         lst += 1 unless r.exclude_end?
       elsif pos.nil? then
         pos, lst = 1, 0
@@ -241,7 +241,7 @@ module Neovim
       if len then
         lst = pos + (len >= 0 ? len : 0)
       end
-      lst = 0 if pos < 0 and lst >= 0
+      lst = 0 if pos < 0 and lst > 0
       yield pos-1, lst-1
     end
 
@@ -249,11 +249,11 @@ module Neovim
       line_indices pos, len do |*fl|
         c = nil
         fl.map! { |y|
-          if y >= 0 then
-            y
-          else
-            y + 1 + (c ||= count)
+          unless y >= 0 then
+            c ||= count
+            y += 1 + c
           end
+          y
         }
         yield *fl
       end
