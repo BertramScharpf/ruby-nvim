@@ -129,6 +129,8 @@ This results in:
 :
 ```
 
+The anonymous variable `_` hold this last result.
+
 Output will be added to the buffer, too.
 
 ```
