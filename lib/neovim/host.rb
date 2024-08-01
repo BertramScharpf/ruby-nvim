@@ -80,18 +80,15 @@ module Neovim
     end
 
 
-    def execute_handler name, args
+    def find_handler name
       @plugins.each_value do |plugin|
-        handler = plugin.get_handler name
-        if handler then
+        h = plugin.get_handler name
+        if h then
           log :info, "Found handler", name: name
-          log :debug1, "Calling with", args: args
-          return handler.execute @conn.client, *args
+          return h
         end
       end
       super
-    rescue NoHandlerError
-      raise NoHandlerError, "No handler found for #{name.inspect}."
     end
 
   end

@@ -29,9 +29,8 @@ module Neovim
     def sync ; @spec[ :sync] ; end
     alias sync? sync
 
-    def execute *args
-      @block.call *args
-    end
+    def needs_client? ; true ; end
+    def execute *args ; @block.call *args ; end
 
     private
 
@@ -46,6 +45,18 @@ module Neovim
       }
       opts.compact!
     end
+
+  end
+
+  class HandlerPlain < Handler
+
+    def initialize *args, **kwargs
+      super *args, **kwargs do |client,*a|
+        yield *a
+      end
+    end
+
+    def needs_client? ; false ; end
 
   end
 
@@ -99,10 +110,12 @@ module Neovim
 
     private
 
+    HANDLER = Handler
+
     def add_handler qualified_name, name, type = nil, sync = nil, **opts, &block
       name = name.to_s
       qualified_name ||= name
-      h = Handler.new name, type, sync, **opts, &block
+      h = self.class::HANDLER.new name, type, sync, **opts, &block
       log :info, "Adding Handler", qualified_name: qualified_name, handler: h.spec
       @handlers[ qualified_name] = h
     end
@@ -117,10 +130,10 @@ module Neovim
 
     TYPE = :base
 
-    def plain name, **opts
-      add_handler nil, name, **opts do |client,*args|
-        yield *args
-      end
+    HANDLER = HandlerPlain
+
+    def plain name, **opts, &block
+      add_handler nil, name, **opts, &block
     end
 
   end

@@ -99,8 +99,6 @@ module Neovim
       end
     end
 
-    class NoHandlerError < StandardError ; end
-
 
     include Logging
 
@@ -152,6 +150,10 @@ module Neovim
 
     def run until_id = nil
       loop do
+        if @deferred and @conn.client then
+          d, @deferred = @deferred, nil
+          d.each { |p| p.call }
+        end
         message = get
         case message
         when Message::Response then
@@ -161,15 +163,30 @@ module Neovim
             log :warning, "Dropped response", message.request_id
           end
         when Message::Request, Message::Notification then
-          begin
-            r = execute_handler message.method_name, message.arguments
-            log :debug1, "Request result", result: r
-          rescue
-            e = [ 0, $!.to_s]
-            log_exception :error
-          end
-          if message.respond_to? :request_id then
-            put Message::Response[ message.request_id, e, r]
+          h = find_handler message.method_name
+          if h then
+            p = proc do
+              begin
+                log :debug1, "Calling handler", name: message.method_name, args: message.arguments
+                r = h.execute @conn.client, *message.arguments
+                log :debug1, "Handler result", result: r
+              rescue
+                e = [ 0, $!.to_s]
+                log_exception :error
+              end
+              put Message::Response[ message.request_id, e, r] if message.respond_to? :request_id
+            end
+            if @conn.client or not h.needs_client? then
+              p.call
+            else
+              log :info, "Deferred handler for", name: message.method_name
+              @deferred ||= []
+              @deferred.push p
+            end
+          else
+            msg = "No handler found for #{message.method_name}."
+            log :error, msg
+            put Message::Response[ message.request_id, [0, msg], nil] if message.respond_to? :request_id
           end
         end
         break if until_id and @responses[ until_id]
@@ -214,8 +231,7 @@ module Neovim
       raise Disconnected
     end
 
-    def execute_handler name, args
-      raise NoHandlerError, "This instance has no handlers (called: #{name.inspect})."
+    def find_handler name
     end
 
   end
