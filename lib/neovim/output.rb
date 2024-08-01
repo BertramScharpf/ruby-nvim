@@ -8,14 +8,14 @@ module Neovim
 
   class Write
     class <<self
-      def open client
-        i = new client
+      def open *args, **kwargs
+        i = new *args, **kwargs
         yield i
       ensure
         i.finish
       end
     end
-    def initialize client
+    def initialize client, *rest
       @client = client
     end
     def print *args
@@ -40,8 +40,8 @@ module Neovim
 
   class WriteStd < Write
     class <<self
-      def redirect client
-        open client do |i|
+      def redirect *args, **kwargs
+        open *args, **kwargs do |i|
           old, $stdout = $stdout, i
           yield
         ensure
@@ -70,8 +70,8 @@ module Neovim
 
   class WriteErr < Write
     class <<self
-      def redirect client
-        open client do |i|
+      def redirect *args, **kwargs
+        open *args, **kwargs do |i|
           old, $stderr = $stderr, i
           yield
         ensure
@@ -99,9 +99,10 @@ module Neovim
   end
 
   class WriteBuf < WriteStd
-    def initialize *args
+    def initialize *args, whole: nil, top: nil
       super
       @lines = [""]
+      @hole, @top = whole, top
     end
     def write *args
       s = @lines.pop
@@ -111,7 +112,12 @@ module Neovim
     end
     def finish
       @lines.last.notempty? or @lines.pop
-      @client.put @lines, "l", true, true
+      if @whole then
+        @client.buf_set_lines 0, 0, -1, true, @lines
+      else
+        @client.put @lines, "l", true, !@top
+      end
+      @lines = nil
     end
   end
 
