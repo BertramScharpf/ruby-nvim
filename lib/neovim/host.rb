@@ -41,8 +41,7 @@ module Neovim
 
     def initialize conn
       super conn
-      @plugins = {}
-      @plugins[ :base] = DslPlain.open :base do |dsl|
+      @plugins[ :base] = DslPlain.open do |dsl|
         dsl.plain "poll" do
           start
           @plugins.each_value { |p| p.setup @conn.client }
@@ -61,34 +60,6 @@ module Neovim
 
     def add_plugins source, plugins
       @plugins[ source] = plugins
-    end
-
-
-    def client_name
-      types = @plugins.map { |_,p| p.type if p.type != :base }
-      types.uniq!
-      types.compact!
-      name = types.join "-"
-      log :info, "Client Name", name: name
-      "ruby-#{name}-host"
-    end
-
-    def client_methods
-      r = {}
-      @plugins[ :base].options { |name,opts| r[ name] = opts }
-      r
-    end
-
-
-    def find_handler name
-      @plugins.each_value do |plugin|
-        h = plugin.get_handler name
-        if h then
-          log :info, "Found handler", name: name
-          return h
-        end
-      end
-      super
     end
 
   end

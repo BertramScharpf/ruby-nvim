@@ -56,6 +56,10 @@ module Neovim
 
     TYPE = :script
 
+    def initialize source
+      super *[]
+    end
+
     def setup &block
       add_setup_block &block
     end

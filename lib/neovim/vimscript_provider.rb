@@ -12,7 +12,7 @@ module Neovim
     TYPE = :rplugin
 
     def initialize source
-      super
+      super *[]
       @source = source
     end
 

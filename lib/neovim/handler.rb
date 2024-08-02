@@ -92,14 +92,14 @@ module Neovim
 
     class <<self
       private :new
-      def open source
-        i = new source
+      def open *args
+        i = new *args
         yield i
         i.mkplugin
       end
     end
 
-    def initialize source
+    def initialize
       @setups = []
       @handlers = {}
     end
@@ -128,7 +128,7 @@ module Neovim
 
   class DslPlain < DslBase
 
-    TYPE = :base
+    TYPE = nil
 
     HANDLER = HandlerPlain
 

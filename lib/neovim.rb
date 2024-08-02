@@ -11,7 +11,7 @@ module Neovim
 
     def start_remote &block
       Host.run do |h|
-        p = DslRemote.open :remote, &block
+        p = DslRemote.open &block
         h.add_plugins :remote, p
         h.start
       end

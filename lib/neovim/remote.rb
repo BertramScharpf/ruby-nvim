@@ -137,11 +137,33 @@ module Neovim
       @conn = conn
       @request_id = 0
       @responses = {}
+      @plugins = {}
     end
 
-    def client_name    ; "ruby-client"                  ; end
-    def client_type    ; self.class.plain_name.downcase ; end
-    def client_methods ;                                  end
+    def client_name
+      l = @plugins.values.select { |p| p.type }
+      if l.notempty? then
+        l.map! { |p| p.type }
+        l.uniq!
+        name = l.join "-"
+        log :info, "Client Name", name: name
+        "ruby-#{name}-host"
+      else
+        "ruby-client"
+      end
+    end
+
+    def client_type ; self.class.plain_name.downcase ; end
+
+    def client_methods
+      l = @plugins.values.reject { |p| p.type }
+      if l.notempty? then
+        r = {}
+        l.each { |p| p.options { |name,opts| r[ name] = opts } }
+        r
+      end
+    end
+
 
     def start
       @conn.start self
@@ -184,9 +206,9 @@ module Neovim
               @deferred.push p
             end
           else
-            msg = "No handler found for #{message.method_name}."
-            log :error, msg
-            put Message::Response[ message.request_id, [0, msg], nil] if message.respond_to? :request_id
+            if message.respond_to? :request_id then
+              put Message::Response[ message.request_id, [0, "No handler #{message.method_name}."], nil]
+            end
           end
         end
         break if until_id and @responses[ until_id]
@@ -232,6 +254,15 @@ module Neovim
     end
 
     def find_handler name
+      @plugins.each_value do |plugin|
+        h = plugin.get_handler name
+        if h then
+          log :info, "Found handler", name: name
+          return h
+        end
+      end
+      log :error, "No handler found for #{name}."
+      nil
     end
 
   end
