@@ -9,6 +9,11 @@ require "neovim/host"
 
 module Neovim
 
+  if $*.delete "--version" then
+    puts [ INFO.name, INFO.version].join " "
+    exit
+  end
+
   class <<self
 
     def plugin &block
@@ -25,11 +30,6 @@ module Neovim
       end
     end
 
-  end
-
-  if $*.delete "--version" then
-    puts [ Neovim::INFO.name, Neovim::INFO.version].join " "
-    exit
   end
 
   r = Host.run do |h|
