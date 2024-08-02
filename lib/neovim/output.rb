@@ -3,7 +3,6 @@
 #
 
 
-
 module Neovim
 
   class Write
@@ -27,9 +26,16 @@ module Neovim
         write $/
       else
         args.each { |a|
-          a = a.to_s
-          write a
-          write $/ unless a.end_with? $/
+          case a
+          when Array then
+            a.each { |e|
+              puts e
+            }
+          else
+            a = a.to_s
+            write a
+            write $/ unless a.end_with? $/
+          end
         }
       end
       nil
@@ -101,23 +107,29 @@ module Neovim
   class WriteBuf < WriteStd
     def initialize *args, whole: nil, top: nil
       super
-      @lines = [""]
-      @hole, @top = whole, top
+      @lines, @last = [], ""
+      @whole, @top = whole, top
     end
     def write *args
-      s = @lines.pop
-      args.each { |a| s << a }
-      s.split $/, -1 do |l| @lines.push l end
+      args.each { |a| @last << a }
+      loop do
+        n, r = @last.split $/, 2
+        r or break
+        @lines.push n
+        @last = r
+      end
       nil
     end
     def finish
-      @lines.last.notempty? or @lines.pop
+      if @last.notempty? then
+        @lines.push @last
+        @last = nil
+      end
       if @whole then
         @client.buf_set_lines 0, 0, -1, true, @lines
       else
         @client.put @lines, "l", true, !@top
       end
-      @lines = nil
     end
   end
 
