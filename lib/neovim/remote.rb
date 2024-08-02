@@ -1,5 +1,5 @@
 #
-#  neovim/remote.rb  --  Host for Neovim
+#  neovim/remote.rb  --  Remote access for Neovim
 #
 
 require "neovim/foreign/supplement"
@@ -214,7 +214,7 @@ module Neovim
     private
 
     def put msg
-      log :debug1, "Sending Message", data: msg
+      log :debug2, "Sending Message", data: msg
       @conn.put msg.to_a
       self
     rescue Errno::EPIPE
@@ -225,7 +225,7 @@ module Neovim
       IO.select [@conn.input], nil, nil
       raise Disconnected if @conn.eof?
       msg = Message.from_array @conn.get
-      log :debug1, "Received Message", data: msg
+      log :debug2, "Received Message", data: msg
       msg
     rescue EOFError
       raise Disconnected
