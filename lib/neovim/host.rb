@@ -40,9 +40,9 @@ module Neovim
     end
 
     def initialize conn
-      super
+      super conn
       @plugins = {}
-      DslPlain.open :base, self do |dsl|
+      @plugins[ :base] = DslPlain.open :base do |dsl|
         dsl.plain "poll" do
           start
           @plugins.each_value { |p| p.setup @conn.client }

@@ -92,10 +92,10 @@ module Neovim
 
     class <<self
       private :new
-      def open source, host
+      def open source
         i = new source
         yield i
-        i.add_plugins source, host
+        i.mkplugin
       end
     end
 
@@ -104,8 +104,8 @@ module Neovim
       @handlers = {}
     end
 
-    def add_plugins source, host
-      host.add_plugins source, (Plugins.new self.class::TYPE, @setups, @handlers)
+    def mkplugin
+      Plugins.new self.class::TYPE, @setups, @handlers
     end
 
     private

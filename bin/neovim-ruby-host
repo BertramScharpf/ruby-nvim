@@ -25,9 +25,10 @@ module Neovim
 
     def run_dsl dsl
       @host or raise "Can't add plugins outside of a running session."
-      dsl.open @path, @host do |dsl|
+      p = dsl.open @path do |dsl|
         yield dsl
       end
+      @host.add_plugins @path, p
     end
 
   end
