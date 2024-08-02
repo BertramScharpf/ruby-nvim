@@ -66,12 +66,12 @@ module Neovim
 
       attr_reader :type
 
-      def initialize type, setup_blocks, handlers
-        @type, @setup_blocks, @handlers = type, setup_blocks, handlers
+      def initialize type, setups, handlers
+        @type, @setups, @handlers = type, setups, handlers
       end
 
       def setup client
-        @setup_blocks.each { |b| b.call client }
+        @setups.each { |b| b.call client }
       end
 
       def get_handler name
@@ -100,12 +100,12 @@ module Neovim
     end
 
     def initialize source
-      @setup_blocks = []
+      @setups = []
       @handlers = {}
     end
 
     def add_plugins source, host
-      host.add_plugins source, (Plugins.new self.class::TYPE, @setup_blocks, @handlers)
+      host.add_plugins source, (Plugins.new self.class::TYPE, @setups, @handlers)
     end
 
     private
@@ -121,7 +121,7 @@ module Neovim
     end
 
     def add_setup_block &block
-      @setup_blocks.push block
+      @setups.push block
     end
 
   end
