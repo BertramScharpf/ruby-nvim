@@ -104,20 +104,30 @@ module Neovim
 
     class <<self
 
+      include Logging
+
       private :new
 
-      def open conntype, *args, **kwargs
+      def open_conn conntype, *args, **kwargs
         conntype.open_files *args, **kwargs do |conn|
-          yield (new conn)
+          yield conn
         end
       end
 
-      include Logging
+      public
 
-      def start *args
+      def open conntype, *args, **kwargs
+        open_conn conntype, *args, **kwargs do |conn|
+          i = new nil, conn
+          yield i
+        end
+      end
+
+      def start plugins, *args
         open_logfile do
           log :info, "Starting", args: $*
-          open *args do |i|
+          open_conn *args do |conn|
+            i = new plugins, conn
             yield i
           end
         ensure
@@ -126,18 +136,19 @@ module Neovim
       end
 
       def start_client *args
-        start *args do |i|
+        start nil, *args do |i|
           yield i.start
         end
       end
 
     end
 
-    def initialize conn
+    def initialize plugins, conn
       @conn = conn
       @request_id = 0
       @responses = {}
       @plugins = {}
+      @plugins.update plugins if plugins
     end
 
     def client_name

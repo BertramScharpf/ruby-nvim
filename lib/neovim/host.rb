@@ -8,20 +8,19 @@ require "neovim/handler"
 
 module Neovim
 
-  class Host < Remote
+  class Provider < Remote
 
     class <<self
 
-      def start
-        super ConnectionStdio do |h|
+      def start plugins
+        super plugins, ConnectionStdio do |h|
           yield h
         end
       end
 
-      def run
+      def run plugins
         $stdin.tty? and raise "This program expects to be called by Neovim. It can't run interactively."
-        Host.start do |h|
-          yield h
+        start plugins do |h|
           h.run
           nil
         rescue Remote::Disconnected
@@ -39,8 +38,12 @@ module Neovim
 
     end
 
-    def initialize conn
-      super conn
+  end
+
+  class Host < Provider
+
+    def initialize plugins, conn
+      super plugins, conn
       @plugins[ :base] = DslPlain.open do |dsl|
         dsl.plain "poll" do
           start
@@ -56,10 +59,6 @@ module Neovim
           raise "#{@conn.error errid} from Neovim: #{msg}"
         end
       end
-    end
-
-    def add_plugins source, plugins
-      @plugins[ source] = plugins
     end
 
   end

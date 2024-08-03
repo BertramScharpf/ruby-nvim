@@ -23,29 +23,31 @@ module Neovim
 
     private
 
-    def run_dsl dsl
-      @host or raise "Can't add plugins outside of a running session."
-      p = dsl.open @path do |dsl|
-        yield dsl
-      end
-      @host.add_plugins @path, p
+    def run_dsl dsl, &block
+      @plugins or raise "Can't add plugins outside of a running session."
+      @plugins[ @path] = dsl.open @path, &block
     end
 
-  end
+    public
 
-  r = Host.run do |h|
-    begin
-      @host = h
-      $*.each do |p|
-        @path = p
-        Kernel.load @path, true
+    def load_plugins
+      begin
+        @plugins = {}
+        $*.each do |p|
+          @path = p
+          Kernel.load @path, true
+        ensure
+          @path = nil
+        end
+        @plugins
       ensure
-        @path = nil
+        @plugins = nil
       end
-    ensure
-      @host = nil
     end
+
   end
+
+  r = Host.run load_plugins
   exit r.to_i
 
 end
