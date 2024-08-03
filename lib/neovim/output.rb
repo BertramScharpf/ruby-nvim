@@ -17,6 +17,10 @@ module Neovim
     def initialize client, *rest
       @client = client
     end
+    def << arg
+      write arg.to_s
+      self
+    end
     def print *args
       args.each { |a| write a.to_s }
       nil
