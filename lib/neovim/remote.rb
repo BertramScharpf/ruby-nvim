@@ -21,6 +21,7 @@ module Neovim
         def from_array ary
           kind, *payload = *ary
           klass = find kind
+          klass or raise "No message type for id #{kind.inspect}"
           klass[ *payload]
         end
 
@@ -93,11 +94,7 @@ module Neovim
 
     class ResponseError < StandardError ; end
 
-    class Disconnected < RuntimeError
-      def initialize
-        super "Lost connection to nvim process"
-      end
-    end
+    class Disconnected < RuntimeError ; end
 
 
     include Logging
@@ -251,17 +248,17 @@ module Neovim
       @conn.put msg.to_a
       self
     rescue Errno::EPIPE
-      raise Disconnected
+      raise Disconnected, "Broken pipe on write"
     end
 
     def get
       IO.select [@conn.input], nil, nil
-      raise Disconnected if @conn.eof?
+      raise Disconnected, "EOF on wait" if @conn.eof?
       msg = Message.from_array @conn.get
       log :debug2, "Received Message", data: msg
       msg
     rescue EOFError
-      raise Disconnected
+      raise Disconnected, "EOF on read"
     end
 
     def find_handler name
