@@ -64,6 +64,7 @@ module Neovim
   class WriteOut < WriteStd
     def write *args
       args.each { |a|
+        a = a.to_s
         a.notempty? or next
         @client.out_write a
         @line_open = !(a.end_with? $/)
@@ -92,7 +93,7 @@ module Neovim
     def write *args
       args.each { |a|
         @rest ||= ""
-        @rest << a
+        @rest << a.to_s
         while @rest =~ /#$// do
           @client.err_writeln $`
           @rest = $'
@@ -115,7 +116,7 @@ module Neovim
       @whole, @top = whole, top
     end
     def write *args
-      args.each { |a| @last << a }
+      args.each { |a| @last << a.to_s }
       loop do
         n, r = @last.split $/, 2
         r or break
