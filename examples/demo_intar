@@ -27,7 +27,7 @@ module Neovim
       i.set_var :c, c
       i.set_var :b, b
       i.set_var :w, w
-      puts <<~EOT
+      puts <<~'EOT'
         # Example calls:
           c.set_option_value "nu", false, {}
           w.set_option :nu, :rnu
@@ -35,6 +35,7 @@ module Neovim
           puts b[w.line]
           b[w.line] += ["----"]
           b.map! w.line do |x| x << "!" end
+          c.call_function "setreg", ["a", "hello\nbye", "l"]
       EOT
       i.run
     end
