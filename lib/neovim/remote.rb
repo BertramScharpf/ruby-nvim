@@ -224,11 +224,11 @@ module Neovim
     end
 
     def request method, *args
-      @request_id += 1
-      put Message::Request[ @request_id, method, args]
-      @responses[ @request_id] = nil
-      run @request_id
-      r = @responses.delete @request_id
+      rid = @request_id = @request_id.succ
+      put Message::Request[ rid, method, args]
+      @responses[ rid] = nil
+      run rid
+      r = @responses.delete rid
       if r.error then
         t, e = *r.error
         t = @conn.error t
