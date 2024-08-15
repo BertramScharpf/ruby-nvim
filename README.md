@@ -273,6 +273,17 @@ let g:ruby_require = "neovim/tools/copy"
 '<,'>ruby tmuxbuf $lines
 ```
 
+Make a hex dump.
+
+```vim
+ruby <<EOT
+  require "neovim/foreign/xxd"
+  bn = $curbuf.get_name
+  $vim.command :new
+  File.open bn do |b| Xxd::Dump.new.run b do |l| $vim.put [l], "l", false, true end end
+EOT
+```
+
 
 ## Copyright
 
