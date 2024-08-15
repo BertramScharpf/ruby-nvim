@@ -69,6 +69,9 @@ echo Sum(13,7)
 The `:ruby...` commands and the `rubyeval()` function behave as descibed
 in `:h ruby`.
 
+Files mentioned in the global variable `g:ruby_require` will be loaded before
+the first Ruby code will be run.
+
 Additionally you can directly execute the buffers contents:
 
 ```vim
@@ -256,6 +259,18 @@ main:1:002> b = c.get_current_buf
 main:1:003> b[1]
 => ["root:*:0:0:Charlie &:/root:/bin/sh"]
 main:1:004> \q!!
+```
+
+
+#### Miscellaneous Tools
+
+Put text into an X selection or a TMux register.
+
+```vim
+let g:ruby_require = "neovim/tools/copy"
+'<,'>ruby xsel $lines
+'<,'>ruby xsel! $ines
+'<,'>ruby tmuxbuf $lines
 ```
 
 

@@ -169,6 +169,21 @@ module Neovim
   plugin_provider do |dsl|
 
     dsl.setup do |client|
+      r = client.get_var "ruby_require" rescue nil
+      case r
+      when Array then r = r.notempty?
+      when nil   then nil
+      else            r = [r]
+      end
+      if r then
+        WriteOut.redirect client do  # Protect the RPC interface against erroneous output.
+          r.each do |l|
+            require l
+          rescue LoadError
+            client.err_writeln + $!.to_s
+          end
+        end
+      end
       $curbuf = client.get_current_buf
       $curwin = client.get_current_win
     end
