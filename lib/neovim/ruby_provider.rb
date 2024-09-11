@@ -117,53 +117,6 @@ module Neovim
       run_dsl DslProvider, &block
     end
 
-    def build_sum lines
-      require "bigdecimal"
-      sum = BigDecimal 0
-      prev, decs = 0, 0
-      sep = "."
-      lines.each { |l|
-        l.slice! /^.*:/
-        l.slice! /#.*/
-        l = l.split /(?:\+\s+|\|)/
-        l.map! { |m|
-          m.strip!
-          if m =~ %r/ *%\z/ then
-            prev * (BigDecimal $`) / 100
-          else
-            m = m.split "*"
-            m.map! { |n|
-              n.sub! /,/ do sep = $& ; "." end
-                n.sub! /\.(?:-+|([0-9]+))/ do
-                  if $1 then
-                    d = $1.length
-                    decs = d if decs < d
-                    ".#$1"
-                  else
-                    decs = 2
-                    nil
-                  end
-                end
-                BigDecimal n
-            }
-            prev = m.inject do |p,e| p*e end
-          end
-        }
-        sum = l.inject sum do |s,e| s+e end
-      }
-      sum = sum.round decs
-      case sum
-      when BigDecimal then
-        sum = sum.to_s "F"
-        sum.sub! /(?:\.([0-9]+))?\z/ do
-          sep + ($1.to_s.ljust decs, "0")
-        end
-      when Integer    then
-        sum = sum.to_s
-      end
-      sum
-    end
-
   end
 
   plugin_provider do |dsl|
@@ -226,9 +179,16 @@ module Neovim
         client.command "#{lst}"
         set_globals client, fst..lst do |lines|
           WriteBuf.redirect client do
-            s = build_sum lines
-            puts "-"*(s.length + 4)
-            puts s
+            require "neovim/tools/calculator"
+            @calc ||= Calculator.new
+            @calc.reset!
+            w = 0
+            lines.each { |l|
+              l.length.tap { |g| w = g if g > w }
+              @calc.add l
+            }
+            puts "-"*w
+            puts @calc.result
           rescue
             puts "Error: #$! (#{$!.class})"
           end

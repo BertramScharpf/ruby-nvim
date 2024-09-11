@@ -150,9 +150,12 @@ Further, a simple number/cash summing tool is included.
 ```
 Apples    :     3.99
 Bananas   : 5 * 0.40          # multiplication
-Oranges   :     3.59 | -10%   # percentage added (here subtracted)
+Oranges   :     3.59 - 10%    # percentage added (here subtracted)
 Kiwi      :     0,40          # comma is allowed
 Coconut   :     5,-           # empty decimal places
+# !dot                        # dot forced now
+Tangerines:     4.44
+# !comma                      # result with comma
 ~
 ~
 :%ruby +
