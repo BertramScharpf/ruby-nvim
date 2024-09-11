@@ -180,7 +180,7 @@ module Neovim
           r.each do |l|
             require l
           rescue LoadError
-            client.err_writeln + $!.to_s
+            client.out_write "Warning: #$!"
           end
         end
       end
