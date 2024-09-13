@@ -11,6 +11,7 @@ module Neovim
   class Calculator
 
     def result
+      @result or return
       r = @result.round @decs
       case r
       when BigDecimal then
@@ -50,8 +51,8 @@ module Neovim
       line.notempty? or return
 
       products = []
-      line.split /(?:[;|&]|\s+(?:[,+-]\s+)?)/ do |p|
-        products.push [ (split_products p), $& == "-"]
+      line.split /(?:[;|&]|\s+[,+-]\s+)/ do |p|
+        products.push [ (split_products p), $& =~ /-/]
       end
 
       minus = false
