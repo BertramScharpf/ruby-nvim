@@ -50,7 +50,7 @@ module Neovim
       line.notempty? or return
 
       products = []
-      line.split /(?<![,.])[+-]/ do |p|
+      line.split /(?:[;|&]|\s+(?:[,+-]\s+)?)/ do |p|
         products.push [ (split_products p), $& == "-"]
       end
 
