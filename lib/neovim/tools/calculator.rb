@@ -31,10 +31,11 @@ module Neovim
 
     def decs= d ; @decs = Integer d ; end
 
-    def dot!   ; @sep, @grp = ".", "," ; end
-    def comma! ; @sep, @grp = ",", "." ; end
+    def dot!   ; @sep = "." ; end
     def dot?   ; @sep == "." ; end
+    def comma! ; @sep = "," ; end
     def comma? ; @sep == "," ; end
+    def auto!  ; @sep = nil ; end
 
     def add line
       line = line.chomp
@@ -43,6 +44,7 @@ module Neovim
         case $1
           when "c", "comma", "k", "komma" then comma!
           when "d", "dot", "p", "point"   then dot!
+          when "a", "auto"                then auto!
           when /\A\d+\z/                  then @decs = $1.to_i
         end
       end
@@ -91,10 +93,9 @@ module Neovim
       if n =~ %r/ *%\z/ then
         @prev * (BigDecimal $`) / 100
       else
-        comma! if not @sep and n =~ /\d,\d/
-        case @sep
-        when "," then n.gsub! @grp, "_" ; n.sub! @sep, "."
-        when "." then n.gsub! @grp, "_"
+        comma! if not @sep and n =~ /\d,(?:-|\d+\b(?:[^.]|$))/
+        if   @sep == "," then n.gsub! ".", "_" ; n.sub! @sep, "."
+        else                  n.gsub! ",", "_"
         end
         if    n =~ /\.-/ then
           n = $`
