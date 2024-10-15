@@ -12,7 +12,7 @@ module Neovim
 
     def result
       @result or return
-      r = @result.round @decs
+      r = @decs ? (@result.round @decs) : @result
       case r
       when BigDecimal then
         r = r.to_s "F"
