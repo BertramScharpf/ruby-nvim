@@ -27,7 +27,7 @@ module Neovim
           log :fatal, "Disconnected"
           nil
         rescue SignalException
-          n = $!.signm
+          n = $!.signm.notempty? || $!.class.to_s
           log :fatal, "Signal was caught: #{n}"
           (n =~ /\A(?:SIG)?TERM\z/) ? 0 : 1
         rescue Exception
