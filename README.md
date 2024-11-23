@@ -15,7 +15,7 @@ sudo gem uninstall neovim || true
 sudo gem install nvim
 ```
 
-You may prefer to also install the dependencies. Yet, this is not
+You may prefer to also install the dependencies.  Yet, this is not
 neccessary, as they are small and Ruby-Nvim includes a copy of them.
 
 ```shell
@@ -91,7 +91,7 @@ set number
 :1,6ruby |
 ```
 
-The last value, if it is not `nil`,  will be added through `#inspect` as
+The last value, if it is not `nil`, will be added through `#inspect` as
 a comment.
 
 ```
@@ -132,7 +132,32 @@ This results in:
 :
 ```
 
-The anonymous variable `_` hold this last result.
+
+#### Last return value
+
+The anonymous variable `_` will hold the result.
+of the last evaluation.
+
+```
+ 1 7*11*13
+~
+~
+:%ruby
+```
+
+Then this will work:
+
+```
+ 1 7*11*13
+ 2 #=> 1001
+ 3 _ - 1
+~
+~
+:3ruby
+```
+
+
+#### Standard output
 
 Output will be added to the buffer, too.
 
@@ -142,8 +167,35 @@ Output will be added to the buffer, too.
  3 puts "o"
 ~
 ~
+:1,3ruby |
+```
+
+Error output will be displayed on the command line,
+higlighted by `ErrorMsg`.
+
+```
+ 1 $stderr.puts "Oh, no!"
+~
+~
 :%ruby |
 ```
+
+This even applies to subprocesses. They won't mess up
+the RPC communication.
+
+```
+ 1 system *%w(ls -l)
+ 2 system *%w(ls nonexistent)
+~
+~
+:%ruby |
+```
+
+Yet, you should avoid to use `fork` and `exec`, except when
+you're absolutely sure what you're doing.
+
+
+#### Calculator
 
 Further, a simple number/cash summing tool is included.
 
@@ -253,7 +305,7 @@ or ask the running Neovim for its server name.
 echo v:servername
 ```
 
-Then connect to it. This requires the [Intar](https://github.com/BertramScharpf/ruby-intar) gem.
+Then connect to it.  This requires the [Intar](https://github.com/BertramScharpf/ruby-intar) gem.
 
 ```
 $ intar -r neovim/remote

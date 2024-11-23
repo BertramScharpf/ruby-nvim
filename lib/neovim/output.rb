@@ -3,6 +3,37 @@
 #
 
 
+module Kernel
+
+  module_function def system *cmd
+    ro, wo = IO.pipe
+    re, we = IO.pipe
+    child = fork do
+      STDIN.close
+      ro.close ; STDOUT.reopen wo ; wo.close
+      re.close ; STDERR.reopen we ; we.close
+      exec *cmd
+    end
+    wo.close
+    we.close
+    h = { ro => $stdout, re => $stderr, }
+    until h.empty? do
+      h.keys.each { |r|
+        if r.eof? then
+          r.close
+          h.delete r
+        else
+          h[ r].puts r.readline
+        end
+      }
+    end
+    Process.waitpid child
+    $?.success?
+  end
+
+end
+
+
 module Neovim
 
   class Write
