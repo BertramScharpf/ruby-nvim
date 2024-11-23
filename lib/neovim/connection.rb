@@ -113,6 +113,25 @@ module Neovim
         end
       end
 
+      def stdpath what
+        cmd = [ path, "--headless", ]
+        cmd.push "-c", "echo stdpath(#{what.to_s.inspect})"
+        cmd.push "-c", "q"
+        (pipe_stderr cmd)&.tap { |x| x.chomp! }
+      end
+
+      private
+
+      def pipe_stderr cmd
+        re, we = IO.pipe
+        fork do
+          re.close ; $stderr.reopen we ; we.close
+          exec *cmd
+        end
+        we.close
+        re.read
+      end
+
     end
 
   end

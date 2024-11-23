@@ -103,6 +103,11 @@ module Neovim
               v = kwargs.delete k
               params[ k] = v if v
             end
+            unless path =~ /\A(?:\.\/|~|\/)/ then
+              require "neovim/connection"
+              base = ConnectionChild.stdpath "log"
+            end
+            path = File.expand_path path, base
             File.open path, "a", **params do |f|
               yield (new f, **kwargs)
             end

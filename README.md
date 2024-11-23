@@ -215,9 +215,12 @@ let chan = jobstart('./demo_remote.rb', { 'rpc': v:true })
 Logging is a easy as this:
 
 ```shell
-export NVIM_RUBY_LOG_LEVEL=all NVIM_RUBY_LOG_FILE=nvim.log
+export NVIM_RUBY_LOG_LEVEL=all NVIM_RUBY_LOG_FILE=ruby.log
 nvim +'ruby puts "hi"*10'
 ```
+
+If the logfile isn't an absoulte path and doesn't start with `"./"`,
+it will be relative to Neovim's `stdpath("log")`.
 
 To show the log levels, simply run in Neovim:
 
@@ -225,7 +228,8 @@ To show the log levels, simply run in Neovim:
 ruby puts Neovim::Logging::LEVELS.keys
 ```
 
-If you are inside a [Tmux](https://tmux.github.io), you might prefer to trace the colored log in a split window.
+If you are inside a [Tmux](https://tmux.github.io), you might prefer to trace
+the colored log in a split window.
 
 ```shell
 tmux split-window -fhd 'echo -e "\e[33m==== $$ ==== `tty` ====\e[m" ; ln -sf `tty` /tmp/tmux-`id -u`/debug ; exec cat >/dev/null 2>&1'
