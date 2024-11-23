@@ -135,14 +135,14 @@ This results in:
 
 #### Last return value
 
-The anonymous variable `_` will hold the result.
+The anonymous variable `_` will hold the result
 of the last evaluation.
 
 ```
  1 7*11*13
 ~
 ~
-:%ruby
+:%ruby |
 ```
 
 Then this will work:
@@ -153,7 +153,7 @@ Then this will work:
  3 _ - 1
 ~
 ~
-:3ruby
+:3ruby |
 ```
 
 
@@ -195,7 +195,7 @@ Yet, you should avoid to use `fork` and `exec`, except when
 you're absolutely sure what you're doing.
 
 
-#### Calculator
+### Calculator
 
 Further, a simple number/cash summing tool is included.
 
