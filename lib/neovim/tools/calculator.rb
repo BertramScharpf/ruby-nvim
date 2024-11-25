@@ -16,11 +16,16 @@ module Neovim
       case r
       when BigDecimal then
         r = r.to_s "F"
-        r.sub! /(?:(\.)([0-9]+))?\z/ do
-          (@sep||$1) + ($2.to_s.ljust @decs, "0")
+        if @decs.nonzero? then
+          r.sub! /(\.)(\d+)\z/ do (@sep||$1) + ($2.to_s.ljust @decs, "0") end
+        else
+          r.slice! /\.0+\z/
         end
       when Integer    then
         r = r.to_s
+        if @decs.nonzero? then
+          r << (@sep||".") << "0"*@decs
+        end
       end
       r
     end
@@ -31,11 +36,13 @@ module Neovim
 
     def decs= d ; @decs = Integer d ; end
 
-    def dot!   ; @sep = "." ; end
+    def dot!   ; @sep =  "." ; end
     def dot?   ; @sep == "." ; end
-    def comma! ; @sep = "," ; end
+    def comma! ; @sep =  "," ; end
     def comma? ; @sep == "," ; end
-    def auto!  ; @sep = nil ; end
+    def colon! ; @sep =  ":" ; end
+    def colon? ; @sep == ":" ; end
+    def auto!  ; @sep =  nil ; end
 
     def add line
       line = line.chomp
@@ -43,9 +50,11 @@ module Neovim
       if $& =~ /!(\w+)/ then
         case $1
           when "c", "comma", "k", "komma" then comma!
+          when "l", "colon"               then colon!
           when "d", "dot", "p", "point"   then dot!
           when "a", "auto"                then auto!
-          when /\A\d+\z/                  then @decs = $1.to_i
+          when /\A\d+\z/                  then @decs = $&.to_i
+          when "all", "full", "places"    then @decs = nil
         end
       end
       line.slice! /^.*:/
