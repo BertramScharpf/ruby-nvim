@@ -171,7 +171,7 @@ Output will be added to the buffer, too.
 ```
 
 Error output will be displayed on the command line,
-higlighted by `ErrorMsg`.
+highlighted by `ErrorMsg`.
 
 ```
  1 $stderr.puts "Oh, no!"
@@ -328,7 +328,7 @@ Put text into an X selection or a TMux register.
 ```vim
 let g:ruby_require = "neovim/tools/copy"
 '<,'>ruby xsel $lines
-'<,'>ruby xsel! $ines
+'<,'>ruby xsel! $lines
 '<,'>ruby tmuxbuf $lines
 ```
 
