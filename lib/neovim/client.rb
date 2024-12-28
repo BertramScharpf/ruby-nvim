@@ -25,7 +25,7 @@ module Neovim
     def initialize comm, channel_id
       @comm, @channel_id = comm, channel_id
       @functions = {}
-      @objfuncs  = Hash.new do |h,k| h[k] = {} end
+      @objfuncs  = {}
     end
 
     def inspect
@@ -36,10 +36,16 @@ module Neovim
       list.each { |fn|
         next if fn[ "deprecated_since"] && self.class.strict
         n = fn[ "name"]
-        next unless n =~ /\Anvim_/
-        @functions[ $'.to_sym] = n
-        t, = prefixes.find { |t,p| n =~ p }
-        @objfuncs[ t][ $'.to_sym] = n if t
+        if (b = n.starts_with? "nvim_") then
+          @functions[ n[ b...].to_sym] = n
+        end
+        prefixes.each { |t,p|
+          if (b = n.starts_with? p) then
+            @objfuncs[ t] ||= {}
+            @objfuncs[ t][ n[ b...].to_sym] = n
+            break
+          end
+        }
       }
     end
 
@@ -56,7 +62,6 @@ module Neovim
       f or raise UnknownApiObjectFunction, "Object: #{n}, Function: #{name}"
       @comm.request f, obj.index, *args
     end
-
 
 
     def method_missing sym, *args
@@ -78,15 +83,22 @@ module Neovim
       s
     end
 
+    def functions
+      @functions.keys
+    end
+
 
     def has_obj_function? obj, name
       @objfuncs[ obj.type][ name.to_sym].to_bool
     end
 
+    def obj_classes
+      RemoteObject.subclasses.select { |c| @objfuncs[ c.type] rescue nil }
+    end
+
     def obj_functions obj
       @objfuncs[ obj.type].keys
     end
-
 
 
     def message str

@@ -195,6 +195,35 @@ Yet, you should avoid to use `fork` and `exec`, except when
 you're absolutely sure what you're doing.
 
 
+### List all API functions
+
+To show a list of the API functions call something like this:
+
+```
+pp $vim.functions.sort
+pp $vim.obj_classes.map { |c| [ c.type, ($vim.obj_functions c).sort] }.to_h
+nil
+~
+~
+:%ruby |
+```
+
+Deprecated functions and old functions not starting with `nvim_` will be
+hidden. The full list of API functions can be obtained by a call to
+`get_api_info`.
+
+```
+pp $vim.get_api_info
+nil
+~
+~
+:%ruby |
+```
+
+See the script `examples/dump_api` for a more elaborated and colorized
+output.
+
+
 ### Calculator
 
 Further, a simple number/cash summing tool is included.

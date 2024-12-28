@@ -40,7 +40,7 @@ module Neovim
       prefixes = {}
       api_info[ "types"].each do |type,info|
         type = type.to_sym
-        prefixes[ type] = /\A#{info[ "prefix"]}/
+        prefixes[ type] = info[ "prefix"]
         register_type type, info[ "id"]
       end
       @client.add_functions api_info[ "functions"], prefixes

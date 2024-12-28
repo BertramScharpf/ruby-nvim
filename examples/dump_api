@@ -4,71 +4,97 @@
 #  dump_api  --  Dump NeoVim's API
 #
 
-$:.unshift "../lib"
-require "neovim/remote"
-
-
-include Neovim
-
-
-USAGE = <<~EOT
+usage = <<~EOT
   #$0    | nvim - +'set ft=yaml' '+$'    # dump as YAML
   #$0 -a | nvim - +'set ft=yaml' '+$'    # dump by "--api-info" option
   #$0 -j | nvim - +'set ft=json' '+$'    # dump as JSON
+
+  Or just source it from Neovim:
+
+    :let g:ruby_api_info="yaml"
+    :rubyfile #$0
+
 EOT
 
 
-class DumpApi
+if $vim then  # We're getting called from inside a Neovim.
 
-  def get json: nil, alt: nil
-    if json then
-      as_json
-    else
-      if alt then
-        alternative_yaml
+  a = $vim.get_api_info
+  t = ($vim.get_var "ruby_api_info") rescue "yaml"
+  a = case t
+  when "yaml" then require "yaml" ; a.to_yaml
+  when "json" then require "json" ; JSON.pretty_generate a
+  end
+  a = a.split $/
+  $vim.command "vnew"
+  $vim.set_options ft: t, buftype: "nofile"
+  $vim.put a, "l", false, true
+  $vim.command "0"
+
+
+else
+
+  $:.unshift "../lib"
+  require "neovim/remote"
+
+
+  include Neovim
+
+
+  class DumpApi
+
+    def get json: nil, alt: nil
+      if json then
+        as_json
       else
-        as_yaml
+        if alt then
+          alternative_yaml
+        else
+          as_yaml
+        end
       end
     end
-  end
 
-  private
+    private
 
-  def api_info
-    Remote.open ConnectionChild, "-u", "NONE", "-n" do |s|
-      ch, ai = s.request :nvim_get_api_info
-      ai
+    def api_info
+      Remote.open ConnectionChild, "-u", "NONE", "-n" do |s|
+        ch, ai = s.request :nvim_get_api_info
+        ai
+      end
     end
-  end
 
-  def as_json
-    require "json"
-    JSON.pretty_generate api_info
-  end
-
-  def as_yaml
-    require "yaml"
-    api_info.to_yaml
-  end
-
-  def alternative_yaml
-    require "neovim/foreign/mplight"
-    require "yaml"
-    t = MPLight::Types.new
-    t.extend MPLight::Unpacker
-    IO.popen %w(nvim --api-info) do |r|
-      t.init_input r
-      return t.get.to_yaml
+    def as_json
+      require "json"
+      JSON.pretty_generate api_info
     end
+
+    def as_yaml
+      require "yaml"
+      api_info.to_yaml
+    end
+
+    def alternative_yaml
+      require "neovim/foreign/mplight"
+      require "yaml"
+      t = MPLight::Types.new
+      t.extend MPLight::Unpacker
+      IO.popen %w(nvim --api-info) do |r|
+        t.init_input r
+        return t.get.to_yaml
+      end
+    end
+
   end
+
+
+  if $*.delete '-h' then
+    puts usage
+    exit
+  end
+
+  output = DumpApi.new.get json: ($*.delete '-j'), alt: ($*.delete '-a')
+  puts output
 
 end
-
-if $*.delete '-h' then
-  puts USAGE
-  exit
-end
-
-output = DumpApi.new.get json: ($*.delete '-j'), alt: ($*.delete '-a')
-puts output
 

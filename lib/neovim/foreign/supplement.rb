@@ -38,6 +38,10 @@ rescue LoadError
         self
       end
     end
+    def starts_with? oth ; o = oth.to_str ; o.length          if start_with? o ; end
+    def ends_with?   oth ; o = oth.to_str ; length - o.length if end_with?   o ; end
+    alias starts_with starts_with?
+    alias ends_with   ends_with?
   end
 end
 
