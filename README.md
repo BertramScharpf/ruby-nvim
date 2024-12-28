@@ -132,6 +132,18 @@ This results in:
 :
 ```
 
+To inhibit the output of the last value, add a minus (`-`) to the
+`:ruby|` call.
+
+```
+pp Regexp.constants
+~
+~
+:.ruby |-
+```
+
+In this case, you may even omit the pipe (`|`) character.
+
 
 #### Last return value
 
@@ -202,10 +214,9 @@ To show a list of the API functions call something like this:
 ```
 pp $vim.functions.sort
 pp $vim.obj_classes.map { |c| [ c.type, ($vim.obj_functions c).sort] }.to_h
-nil
 ~
 ~
-:%ruby |
+:%ruby |-
 ```
 
 Deprecated functions and old functions not starting with `nvim_` will be
@@ -214,10 +225,9 @@ hidden. The full list of API functions can be obtained by a call to
 
 ```
 pp $vim.get_api_info
-nil
 ~
 ~
-:%ruby |
+:.ruby |-
 ```
 
 See the script `examples/dump_api` for a more elaborated and colorized

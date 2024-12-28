@@ -163,13 +163,14 @@ module Neovim
     # This is called by the +:ruby+ command.
     dsl.rpc :ruby_execute do |client,code,fst,lst|
       code.rstrip!
-      if !code.notempty? or code == "|" then  # Workaround because Neovim doesn't allow empty code (the ultimate Quine)
+      if code =~ /\A\|?(-)?\z/ then  # | is a workaround because Neovim doesn't allow empty code (the ultimate Quine).
+        no_out = $1
         set_global_client client do
           client.command "#{lst}"
           code = (get_lines client, fst..lst).join $/
           WriteBuf.redirect client do
             r = script_binding.eval code, "ruby_run"
-            unless r.nil? then
+            unless no_out or r.nil? then
               script_binding.local_variable_set :_, r
               puts "#=> #{r.inspect}"
             end
