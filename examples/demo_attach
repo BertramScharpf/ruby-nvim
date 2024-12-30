@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 #
-#  test_attach  --  Start a Neovim session and attach to it
+#  demo_attach  --  Start a Neovim session and attach to it
 #
 
 require "neovim/remote"
