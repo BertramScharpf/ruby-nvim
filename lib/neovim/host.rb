@@ -8,6 +8,32 @@ require "neovim/handler"
 
 module Neovim
 
+  class Remote
+
+    class <<self
+
+      def run_remote *args, **kwargs, &block
+        plugins = { remote: (DslRemote.open &block), }
+        start plugins, *args, **kwargs do |i|
+          i.start
+          i.run
+        end
+      rescue Remote::Disconnected
+      end
+
+      def run_sub socket: nil, timeout: nil, &block
+        socket ||= "/tmp/nvim-sub-#$$.sock"
+        f = fork { exec *%w(nvim --listen), socket }
+        Remote.run_remote ConnectionUnix, socket, timeout: timeout||1, &block
+      ensure
+        Process.waitpid f
+      end
+
+    end
+
+  end
+
+
   class Provider < Remote
 
     class <<self

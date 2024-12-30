@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+#
+#  demo_sub  --  Descend to a Neovim session with some text
+#
+
+require "neovim/host"
+
+
+data = <<~EOT
+  Name:     John Doe
+  Mail:     jdoe@example.com
+  Password: verysecret
+EOT
+
+Neovim::Remote.run_sub do |dsl|
+  dsl.setup do |client|
+    d = data.split "\n"
+    client.put d, "l", false, false
+    client.command "autocmd BufUnload <buffer=%d> call rpcrequest(%d,'rb_yield_data',getline(1,'$'))" %
+                            [ client.get_current_buf.number, client.channel_id]
+  end
+  dsl.register_handler "rb_yield_data" do |client,l|
+    data = l.join "\n"
+  end
+end
+
+puts $?.inspect
+puts "data =", data
+
