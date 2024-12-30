@@ -131,7 +131,7 @@ module Neovim
     # Functions as described in ":h ruby"
 
     def name   ; call_obj :get_name   ; end
-    def number ; call_obj :get_number ; end
+    def number ; index                ; end
 
     def count  ; call_obj :line_count ; end
     alias length count
