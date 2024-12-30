@@ -28,8 +28,7 @@ if $vim then  # We're getting called from inside a Neovim.
   a = a.split $/
   $vim.command "vnew"
   $vim.set_options ft: t, buftype: "nofile"
-  $vim.put a, "l", false, true
-  $vim.command "0"
+  $vim.put a, "l", false, false
 
 
 else
