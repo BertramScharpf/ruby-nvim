@@ -47,7 +47,6 @@ module Neovim
       @plugins[ :base] = DslPlain.open do |dsl|
         dsl.plain "poll" do
           start
-          @plugins.each_value { |p| p.setup @conn.client }
           "ok"
         end
         dsl.plain "specs", nargs: 1 do |source|

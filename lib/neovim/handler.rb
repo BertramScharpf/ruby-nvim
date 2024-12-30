@@ -142,6 +142,10 @@ module Neovim
 
     TYPE = :remote
 
+    def setup &block
+      add_setup_block &block
+    end
+
     def register_handler name, &block
       add_handler nil, name, &block
     end

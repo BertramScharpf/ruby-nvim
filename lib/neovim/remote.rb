@@ -175,6 +175,7 @@ module Neovim
 
     def start
       @conn.start self
+      @plugins.each_value { |p| p.setup @conn.client }
       @conn.client
     end
 
