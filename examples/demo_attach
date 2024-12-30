@@ -12,9 +12,8 @@ module Neovim
   SOCKET = "/tmp/nvim-#$$.sock"
 
   system *%W(tmux split-window -dv nvim --listen #{SOCKET})
-  sleep 1
 
-  Remote.start_client ConnectionUnix, SOCKET do |c|
+  Remote.start_client ConnectionUnix, SOCKET, timeout: 1 do |c|
     c.command "e /etc/passwd"
     c.command "/home"
     b = c.get_current_buf

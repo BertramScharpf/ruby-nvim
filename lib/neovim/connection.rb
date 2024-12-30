@@ -69,10 +69,19 @@ module Neovim
 
   class ConnectionTcp < Connection
     class <<self
-      def open_files host, port
+      def open_files host, port, timeout: nil
+        due = Time.now + timeout if timeout
         require "socket"
-        TCPSocket.open host, port do |socket|
-          yield (new socket, socket)
+        begin
+          TCPSocket.open host, port do |socket|
+            due = nil
+            yield (new socket, socket)
+          end
+        rescue Errno::ECONNREFUSED
+          if due then
+            sleep 0.1
+            retry
+          end
         end
       end
     end
@@ -80,10 +89,19 @@ module Neovim
 
   class ConnectionUnix < Connection
     class <<self
-      def open_files path
+      def open_files path, timeout: nil
+        due = Time.now + timeout if timeout
         require "socket"
-        UNIXSocket.open path do |socket|
-          yield (new socket, socket)
+        begin
+          UNIXSocket.open path do |socket|
+            due = nil
+            yield (new socket, socket)
+          end
+        rescue Errno::ENOENT
+          if due then
+            sleep 0.1
+            retry
+          end
         end
       end
     end

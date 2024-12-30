@@ -13,9 +13,8 @@ module Neovim
   SOCKET = "/tmp/nvim-#$$.sock"
 
   system *%W(tmux split-window -dv nvim --listen #{SOCKET})
-  sleep 1
 
-  Remote.start_client ConnectionUnix, SOCKET do |c|
+  Remote.start_client ConnectionUnix, SOCKET, timeout: 1 do |c|
     c.command "set cuc cul"
     c.set_option buftype: "nofile"
     c.set_option :nu

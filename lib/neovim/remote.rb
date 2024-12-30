@@ -120,10 +120,10 @@ module Neovim
         end
       end
 
-      def start plugins, *args
+      def start plugins, *args, **kwargs
         open_logfile do
           log :info, "Starting", args: $*
-          open_conn *args do |conn|
+          open_conn *args, **kwargs do |conn|
             i = new plugins, conn
             yield i
           end
@@ -132,8 +132,8 @@ module Neovim
         end
       end
 
-      def start_client *args
-        start nil, *args do |i|
+      def start_client *args, **kwargs
+        start nil, *args, **kwargs do |i|
           yield i.start
         end
       end
