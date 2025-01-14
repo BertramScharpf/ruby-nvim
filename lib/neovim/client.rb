@@ -112,6 +112,7 @@ module Neovim
 
     def command arg ; call_api :command, arg ; end
 
+    # Be aware that #eval was a private instance method from module Kernel.
     def evaluate expr ; call_api :eval, expr ; end
 
   end

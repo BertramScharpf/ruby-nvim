@@ -19,7 +19,7 @@ module Neovim
   class <<self
 
     def start_remote &block
-      Job.run remote: (DslRemote.open &block), &block
+      Job.run remote: (DslRemote.open &block)
     end
 
   end
