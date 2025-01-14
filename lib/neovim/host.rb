@@ -47,6 +47,7 @@ module Neovim
       def run plugins
         $stdin.tty? and raise "This program expects to be called by Neovim. It can't run interactively."
         start plugins do |h|
+          log :info, "Starting event loop."
           h.run
           nil
         rescue Remote::Disconnected
@@ -54,8 +55,13 @@ module Neovim
           nil
         rescue SignalException
           n = $!.signm.notempty? || $!.class.to_s
-          log :fatal, "Signal was caught: #{n}"
-          (n =~ /\A(?:SIG)?TERM\z/) ? 0 : 1
+          if n =~ /\A(?:SIG)?TERM\z/ then
+            log :info, "Exiting after terminate signal."
+            nil
+          else
+            log :fatal, "Signal was caught: #{n}"
+            1
+          end
         rescue Exception
           log_exception :fatal
           2

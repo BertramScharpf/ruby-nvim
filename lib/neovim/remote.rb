@@ -122,13 +122,13 @@ module Neovim
 
       def start plugins, *args, **kwargs
         open_logfile do
-          log :info, "Starting", args: $*
+          log :debug1, "Starting", args: $*
           open_conn *args, **kwargs do |conn|
             i = new plugins, conn
             yield i
           end
         ensure
-          log :info, "Leaving"
+          log :debug1, "Leaving"
         end
       end
 
@@ -154,7 +154,7 @@ module Neovim
         l.map! { |p| p.type }
         l.uniq!
         name = l.join "-"
-        log :info, "Client Name", name: name
+        log :debug1, "Client Name", name: name
         "ruby-#{name}-host"
       else
         "ruby-client"
@@ -210,7 +210,7 @@ module Neovim
             if @conn.client or not h.needs_client? then
               p.call
             else
-              log :info, "Deferred handler for", name: message.method_name
+              log :debug1, "Deferred handler for", name: message.method_name
               @deferred ||= []
               @deferred.push p
             end
@@ -266,7 +266,7 @@ module Neovim
       @plugins.each_value do |plugin|
         h = plugin.get_handler name
         if h then
-          log :info, "Found handler", name: name
+          log :debug1, "Found handler", name: name
           return h
         end
       end

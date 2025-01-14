@@ -234,8 +234,8 @@ module Neovim
         **kwargs
     end
 
-    def log_exception level
-      Logging.put level, "Exception: #$!",
+    def log_exception level = nil
+      Logging.put level||:error, "Exception: #$!",
         sender: self, caller: (caller 1, 1).first,
         exception: $!.class
       $@.each { |b|
