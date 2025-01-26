@@ -16,9 +16,6 @@ module Neovim
       attr_accessor :strict
     end
 
-    class UnknownApiFunction       < RuntimeError ; end
-    class UnknownApiObjectFunction < RuntimeError ; end
-
 
     attr_reader :channel_id
 

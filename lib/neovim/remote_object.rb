@@ -38,6 +38,9 @@ module Neovim
   end
 
 
+  class UnknownApiFunction       < RuntimeError ; end
+  class UnknownApiObjectFunction < RuntimeError ; end
+
 
   class RemoteObject
 
