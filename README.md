@@ -385,6 +385,6 @@ EOT
 
 ## Copyright
 
-  * (C) 2024 Bertram Scharpf <software@bertram-scharpf.de>
+  * (C) 2024,2025 Bertram Scharpf <software@bertram-scharpf.de>
   * License: [BSD-2-Clause+](./LICENSE)
 
