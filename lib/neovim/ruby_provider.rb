@@ -203,11 +203,17 @@ module Neovim
 
     # This is called by the +:rubyfile+ command.
     dsl.rpc :ruby_execute_file do |client,path,fst,lst|
-      set_globals client, fst..lst do ||
-        r = File.read path
-        script_binding.eval r, "ruby_file #{path}"
+      if path =~ /<(.*)>\z/ then
+        set_global_client client do
+          require $1
+        end
+      else
+        set_globals client, fst..lst do ||
+          r = File.read path
+          script_binding.eval r, "ruby_file #{path}"
+        end
+        nil
       end
-      nil
     end
 
     # This is called by the +:rubydo+ command.

@@ -207,6 +207,52 @@ Yet, you should avoid to use `fork` and `exec`, except when
 you're absolutely sure what you're doing.
 
 
+#### Global variables
+
+The global variable `$vim` will be set to the client.
+
+```
+~
+~
+:ruby $vim.command "split"
+```
+
+Further, the variables `$range` and `$lines` will be set.
+
+```
+ 1 foo
+ 2 bar
+ 3 baz
+~
+:%ruby puts $range.inspect, $lines.inspect
+```
+
+The legacy variables `$curbuf` and `$curwin` are supported.
+
+```
+~
+~
+:ruby puts $curbuf.get_name, $curwin.get_height
+```
+
+
+### Requiring Ruby files
+
+In addition to the `:rubyfile` command as documented, that command can also be
+used to just require a Ruby file. Set the name into angle brackets, and the
+file will be searched in `$:`. Sorry, file name completion will not work.
+
+```
+~
+~
+:rubyfile <yaml>
+```
+
+In this case, the global variables `$range` and `$lines` will not be set. Yet,
+`$vim` still will be available. See the
+[Nxxd](https://github.com/BertramScharpf/ruby-nxxd) gem for a nice example.
+
+
 ### List all API functions
 
 To show a list of the API functions call something like this:
@@ -377,7 +423,7 @@ Make a hex dump.
 ruby <<EOT
   require "neovim/foreign/xxd"
   bn = $curbuf.get_name
-  $vim.command :new
+  $vim.command :enew!
   File.open bn do |b| Xxd::Dump.new.run b do |l| $vim.put [l], "l", false, true end end
 EOT
 ```
