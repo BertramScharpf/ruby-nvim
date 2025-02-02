@@ -1,19 +1,20 @@
 #
-#  neovim/foreign/xxd.rb  --  Xxd reimplementation
+#  neovim/foreign/nxxd.rb  --  Hex Dump Tool
 #
 
 # The purpose of this is simply to reduce dependencies.
 
 begin
-  require "xxd"
+  require "nxxd"
 rescue LoadError
 
 # ----------------------------------------------------------------
 #
-#  xxd.rb  --  A Reimplementation of Xxd in plain Ruby
+#  nxxd.rb  --  Hex Dump Tool
 #
 
-module Xxd
+
+module Nxxd
 
   module ReadChunks
 
@@ -87,53 +88,44 @@ module Xxd
         addr += b.size
       end
       yield @addr_fmt % addr
+      nil
     end
+
 
     class <<self
 
-      def reverse input
-        r = nil
-        pos = 0
-        repeat = false
+      def reverse input, output = nil
+        output ||= ""
+        o = String === output ? (WriteChunksString.new output) : output
+        o.set_encoding Encoding::ASCII_8BIT
+        r, repeat = nil, false
         input.each_line { |l|
+          l.chomp!
           case l
-            when /^\s*#/ then
-            when /^\*/   then repeat = true
-            else
-              if (l.slice! /^(\h+):\s*/) then
+            when /^\s*(?:#|$)/                  then nil
+            when /^\*/                          then repeat = true
+            when /^(?:(\h+):)?\s*((?:\h\h ?)*)/ then
+              addr, nibs = $~.captures
+              if addr then
                 addr = $1.to_i 0x10
                 if repeat then
-                  while pos + r.length < addr do
-                    yield r
-                    pos += r.length
-                  end
-                  if pos < addr then
-                    yield r[ 0, addr - pos]
-                    pos = addr
+                  loop do
+                    s = addr - o.tell
+                    break if s <= 0
+                    o.write s >= r.length ? r : r[ 0, s]
                   end
                   repeat = false
                 else
-                  if pos < addr then
-                    r = ([0].pack "C*") * (addr - pos)
-                    yield r
-                    pos = addr
-                  elsif pos > addr then
-                    yield nil, addr
-                    pos = addr
-                  end
                 end
+                o.seek addr
               end
-              row = []
-              while (nib = l.slice! /^\h\h ?/) do
-                row.push nib.to_i 0x10
-              end
-              if row.any? then
-                r = row.pack "C*"
-                yield r
-                pos += r.length
-              end
+              r = (nibs.scan /\h\h/).map { |x| x.to_i 0x10 }.pack "C*"
+              o.write r
+            else
+              raise "Uninterpretable hex dump: #{l.chomp}"
           end
         }
+        output
       end
 
     end
@@ -161,12 +153,13 @@ module Xxd
     def run input, &block
       if @varname then
         yield "unsigned char #@varname[] = {"
-        yield "};"
         len = run_plain input, &block
+        yield "};"
         yield "unsigned int #@varname\_len = %d;" % len
       else
         run_plain input, &block
       end
+      nil
     end
 
     private
@@ -185,6 +178,34 @@ module Xxd
       len
     end
 
+  end
+
+  class WriteChunksString
+    def initialize str
+      @str = str
+    end
+    def set_encoding enc
+      @str.force_encoding enc
+    end
+    def tell ; @pos || @str.length ; end
+    def seek pos
+      s = pos - @str.length
+      if s >= 0 then
+        s.times { @str << "\0".b }
+      else
+        @pos = pos
+      end
+    end
+    def write b
+      if @pos then
+        l = b.length
+        @str[ @pos, l] = b
+        @pos += l
+        @pos = nil if @pos >= @str.length
+      else
+        @str << b
+      end
+    end
   end
 
 end

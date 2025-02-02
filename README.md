@@ -411,7 +411,7 @@ main:1:004> \q!!
 Put text into an X selection or a TMux register.
 
 ```vim
-let g:ruby_require = "neovim/tools/copy"
+rubyfile <neovim/tools/copy>
 '<,'>ruby xsel $lines
 '<,'>ruby xsel! $lines
 '<,'>ruby tmuxbuf $lines
@@ -421,10 +421,10 @@ Make a hex dump.
 
 ```vim
 ruby <<EOT
-  require "neovim/foreign/xxd"
+  require "neovim/foreign/nxxd"
   bn = $curbuf.get_name
   $vim.command :enew!
-  File.open bn do |b| Xxd::Dump.new.run b do |l| $vim.put [l], "l", false, true end end
+  File.open bn do |b| Nxxd::Dump.new.run b do |l| $vim.put [l], "l", false, true end end
 EOT
 ```
 

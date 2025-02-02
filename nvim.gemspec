@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   if false then
     spec.add_dependency "supplement", "~> 2.18"
     spec.add_dependency "mplight",    "~> 1.0"
+    spec.add_dependency "nxxd",       "~> 1.0"
   end
 
 end

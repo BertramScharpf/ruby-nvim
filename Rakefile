@@ -51,7 +51,7 @@ end
 
 
 task :diffdeps do
-  %w(mplight).each { |gem|
+  %w(mplight nxxd).each { |gem|
     c = `gem contents #{gem}`
     unless $?.success? then
       puts "Gem #{gem} not installed. Cannot compare."
