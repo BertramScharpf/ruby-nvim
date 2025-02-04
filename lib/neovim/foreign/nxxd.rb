@@ -26,6 +26,7 @@ module Nxxd
         i = 0
         while i < input.bytesize do
           b = input.byteslice i, @line_size
+          b.force_encoding Encoding::ASCII_8BIT  # Ruby, shouldn't this rather be self-evident?
           yield b
           i += @line_size
         end
