@@ -191,7 +191,7 @@ module Neovim
           if @responses.key? message.request_id then
             @responses[ message.request_id] = message
           else
-            log :warning, "Dropped response", message.request_id
+            log :warning, "Dropped response", rid: message.request_id
           end
         when Message::Request, Message::Notification then
           h = find_handler message.method_name
