@@ -63,9 +63,9 @@ module Kernel
 
   def cmd_write cmd, data
     case data
-    when Array  then data = data.join $/
-    when String then nil
-    else             data = data.to_s
+    when Enumerable then data = data.join $/
+    when String     then nil
+    else                 data = data.to_s
     end
     IO.popen cmd, "w" do |t| t.write data end
   end

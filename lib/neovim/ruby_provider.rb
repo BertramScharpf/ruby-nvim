@@ -123,11 +123,13 @@ module Neovim
     dsl.setup do |client|
       r = client.get_var "ruby_require" rescue nil
       case r
-      when Array then r = r.notempty?
-      when nil   then nil
-      else            r = [r]
+      when String then r = r.split
+      when Array  then
+      when Hash   then r = r.keys
+      when nil    then nil
+      else             r = [r.to_s]
       end
-      if r then
+      if r.notempty? then
         WriteOut.redirect client do  # Protect the RPC interface against erroneous output.
           r.each do |l|
             require l
