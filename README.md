@@ -417,15 +417,20 @@ rubyfile <neovim/tools/copy>
 '<,'>ruby tmuxbuf $lines
 ```
 
-Make a hex dump.
+Maybe you like to install the
+[Nxxd](https://github.com/BertramScharpf/ruby-nxxd) gem.
 
 ```vim
-ruby <<EOT
-  require "neovim/foreign/nxxd"
-  bn = $curbuf.get_name
-  $vim.command :enew!
-  File.open bn do |b| Nxxd::Dump.new.run b do |l| $vim.put [l], "l", false, true end end
-EOT
+rubyfile <nxxd>
+ruby r = (0...0x80).to_a.map { |c| c.chr }.join
+ruby puts Nxxd::Dump.new.run r
+```
+
+Or even:
+
+```vim
+rubyfile <nxxd>
+HexDump /etc/localtime
 ```
 
 
