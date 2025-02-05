@@ -224,7 +224,7 @@ Further, the variables `$range` and `$lines` will be set.
  2 bar
  3 baz
 ~
-:%ruby puts $range.inspect, $lines.inspect
+:%ruby puts $range, $lines
 ```
 
 The legacy variables `$curbuf` and `$curwin` are supported.

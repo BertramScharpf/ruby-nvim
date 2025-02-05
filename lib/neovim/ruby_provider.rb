@@ -100,16 +100,11 @@ module Neovim
 
     def set_globals client, range
       set_global_client client do
-        lines = get_lines client, range
-        $range, $lines = range, lines
-        yield lines
+        $range, $lines = range, (Lines.new client, range)
+        yield $lines
       end
     ensure
       $range, $lines = nil, nil
-    end
-
-    def get_lines client, range
-      client.buf_get_lines 0, range.begin-1, range.end, true
     end
 
     def plugin_provider &block
@@ -166,11 +161,10 @@ module Neovim
       code.rstrip!
       if code =~ /\A\|?(-)?\z/ then  # | is a workaround because Neovim doesn't allow empty code (the ultimate Quine).
         no_out = $1
-        set_global_client client do
+        set_globals client, fst..lst do |lines|
           client.command "#{lst}"
-          code = (get_lines client, fst..lst).join $/
           WriteBuf.redirect client do
-            r = script_binding.eval code, "ruby_run"
+            r = script_binding.eval lines.to_s, "ruby_run"
             unless no_out or r.nil? then
               script_binding.local_variable_set :_, r
               puts "#=> #{r.inspect}"
@@ -221,20 +215,10 @@ module Neovim
     # This is called by the +:rubydo+ command.
     dsl.rpc :ruby_do_range do |client,fst,lst,code|
       set_globals client, fst..lst do |lines|
-        i = fst
-        lines.each do |l|
-          h = l.hash
+        lines.map! do |l,i|
           (script_binding.eval 'proc do |l,i| $_, $. = l, i end').call l, i
           script_binding.eval code, "ruby_do_range"
-          m = script_binding.eval '$_'
-          if m.hash != h then
-            m = m.lines
-            m.each { |x| x.chomp! }
-            client.buf_set_lines 0, i-1, i, true, m
-            i += m.length
-          else
-            i += 1
-          end
+          script_binding.eval '$_'
         end
       end
       nil

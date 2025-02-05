@@ -114,5 +114,64 @@ module Neovim
 
   end
 
+  class Lines
+
+    include Enumerable
+
+    def initialize client, range
+      case client
+      when Buffer then @client, @buffer = client.client, client.index
+      else             @client, @buffer = client,        0
+      end
+      @i, @last = range.begin, range.end
+    end
+
+    def to_s
+      (@client.buf_get_lines @buffer, @i-1, @last, true).join $/
+    end
+
+    def method_missing sym, *args, **kwargs, &block
+      to_a.send sym, *args, **kwargs, &block
+    end
+
+    def each
+      while @i <= @last do
+        @inc = 1
+        l, = @client.buf_get_lines @buffer, @i-1, @i, true
+        yield l
+        @i += @inc
+      end
+    ensure
+      @i = nil
+    end
+    alias each_line each
+
+    def each_with_no
+      each do |l|
+        yield l, @i
+      end
+    end
+
+    def map!
+      each do |l|
+        h = l.hash
+        m = yield l, @i
+        r =
+          case m
+          when String     then m.lines unless m.hash == h
+          when Enumerable then m.map { |l| l.to_s }
+          when nil, false then []
+          end
+        if r then
+          r.each { |l| l.chomp! }
+          @client.buf_set_lines @buffer, @i-1, @i, true, r
+          @inc = r.length
+          @last += @inc-1
+        end
+      end
+    end
+
+  end
+
 end
 
