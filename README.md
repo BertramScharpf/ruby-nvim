@@ -69,14 +69,11 @@ echo Sum(13,7)
 The `:ruby...` commands and the `rubyeval()` function behave as descibed
 in `:h ruby`.
 
-Files mentioned in the global variable `g:ruby_require` will be loaded before
-the first Ruby code will be run.
+Files mentioned in the global variable `g:ruby_require` will be loaded
+before the first Ruby code will be run.
 
-Additionally you can directly execute the buffers contents:
-
-```vim
-set number
-```
+Additionally you can directly execute the buffers contents (here, I did
+`:set number`):
 
 ```
  1 class C
@@ -203,7 +200,7 @@ the RPC communication.
 :%ruby |
 ```
 
-Yet, you should avoid to use `fork` and `exec`, except when
+Yet, I suggest not to use `fork` and `exec`, except when
 you're absolutely sure what you're doing.
 
 
