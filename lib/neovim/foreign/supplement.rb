@@ -10,6 +10,8 @@ rescue LoadError
   class NilClass ; def notempty? ;                      end ; end
   class String   ; def notempty? ; self unless empty? ; end ; end
   class Array    ; def notempty? ; self unless empty? ; end ; end
+  class Array    ; def first= val ; a[ 0] = val                   ; end ; end
+  class Array    ; def last=  val ; a[-1] = val rescue a.push val ; end ; end
   class NilClass   ; def to_bool ; false ; end ; end
   class FalseClass ; def to_bool ; false ; end ; end
   class Object     ; def to_bool ; true  ; end ; end
