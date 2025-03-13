@@ -1,5 +1,5 @@
 #
-#  neovim/foreign/supplement.rb  --  Addition usefull Ruby functions
+#  neovim/foreign/supplement.rb  --  Additional useful Ruby functions
 #
 
 # The purpose of this is simply to reduce dependencies.
@@ -10,8 +10,9 @@ rescue LoadError
   class NilClass ; def notempty? ;                      end ; end
   class String   ; def notempty? ; self unless empty? ; end ; end
   class Array    ; def notempty? ; self unless empty? ; end ; end
-  class Array    ; def first= val ; a[ 0] = val                   ; end ; end
-  class Array    ; def last=  val ; a[-1] = val rescue a.push val ; end ; end
+  class Array    ; def first= val ; self[ 0] = val ; end ; end
+  class Array    ; def last=  val ; self[-1] = val ;
+                    rescue IndexError ; a.push val ; end ; end
   class NilClass   ; def to_bool ; false ; end ; end
   class FalseClass ; def to_bool ; false ; end ; end
   class Object     ; def to_bool ; true  ; end ; end
@@ -45,5 +46,6 @@ rescue LoadError
     alias starts_with starts_with?
     alias ends_with   ends_with?
   end
+  class Dir ; def entries! ; entries - %w(. ..) ; end ; end
 end
 
