@@ -82,8 +82,13 @@ module Neovim
           end
         end
       rescue Exception
-        line = $@.first[ /:(\d+):/, 1]
-        client.err_writeln "Ruby #$! (#{$!.class}), line #{line}"
+        msg = $!.to_s
+        if msg =~ /\A.*?:(\d+):\s*/ then
+          line, msg = $1, $'
+        else
+          line = $@.first[ /:(\d+):in\b/, 1]
+        end
+        client.err_writeln "Ruby #{$!.class}:#{line}: #{msg}"
       end
     end
 
@@ -164,7 +169,13 @@ module Neovim
         set_globals client, fst..lst do |lines|
           client.command "#{lst}"
           WriteBuf.redirect client do
-            r = script_binding.eval lines.to_s, "ruby_run"
+            r = begin
+              script_binding.eval lines.to_s, "ruby_run"
+            rescue Exception
+              $@.pop until $@.empty? or $@.last.ends_with? ":in `empty_binding'"
+              raise unless $rescue
+              $!
+            end
             unless no_out or r.nil? then
               script_binding.local_variable_set :_, r
               puts "#=> #{r.inspect}"
