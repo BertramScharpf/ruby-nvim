@@ -204,6 +204,53 @@ Yet, I suggest not to use `fork` and `exec`, except when
 you're absolutely sure what you're doing.
 
 
+#### Exception handling
+
+If you prefer, you may return an error as a value, too.
+
+```
+ 1 $rescue = true
+ 2 z = 0
+ 3 q = 1 / z
+~
+~
+:set ft=ruby|1,3ruby |
+```
+
+Then:
+
+```
+ 1 $rescue = true
+ 2 z = 0
+ 3 q = 1 / z
+ 4 #=> #<ZeroDivisionError: divided by 0>
+ 5 puts "=begin", _.backtrace, "=end"
+~
+~
+:5ruby |
+```
+
+Even non-standard errors wil be caught.
+
+```
+ 1 def f ; f ; end
+ 2 f
+~
+~
+:1,2ruby |
+```
+
+```
+ 1 $$
+ 2 #=> 49042
+ 3 sleep 1000
+~
+~
+:3ruby |
+```
+Then say 'kill 49042' somewhere else.
+
+
 #### Global variables
 
 The global variable `$vim` will be set to the client.
