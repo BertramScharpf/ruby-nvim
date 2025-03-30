@@ -12,6 +12,9 @@ module Neovim
   class Client
 
     @strict = true
+    ENV[ "NVIM_RUBY_STRICT"]&.tap { |s|
+      @strict = s =~ /[1-9]|true|yes|on|enable/i
+    }
     class <<self
       attr_accessor :strict
     end
