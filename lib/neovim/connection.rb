@@ -47,6 +47,11 @@ module Neovim
       api_info[ "error_types"].each { |type,info|
         register_error type, info[ "id"]
       }
+      if api_info["version"]["api_level"] >= 13 then
+        @client.define_singleton_method :err_writeln do |msg|
+          call_api :echo, [ [ msg], [ $/]], true, err: true
+        end
+      end
       nil
     end
 
