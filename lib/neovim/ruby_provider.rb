@@ -81,7 +81,7 @@ module Neovim
             yield client, *args
           end
         end
-      rescue ScriptError, StandardError
+      rescue Exception
         line = $@.first[ /:(\d+):/, 1]
         client.err_writeln "Ruby #$! (#{$!.class}), line #{line}"
       end
