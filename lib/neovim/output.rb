@@ -69,7 +69,7 @@ module Neovim
           else
             a = a.to_s
             write a
-            write $/ unless a.end_with? $/
+            a.end_with? $/ or write $/
           end
         }
       end
