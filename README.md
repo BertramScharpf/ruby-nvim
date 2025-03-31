@@ -69,9 +69,6 @@ echo Sum(13,7)
 The `:ruby...` commands and the `rubyeval()` function behave as descibed
 in `:h ruby`.
 
-Files mentioned in the global variable `g:ruby_require` will be loaded
-before the first Ruby code will be run.
-
 Additionally you can directly execute the buffers contents (here, I did
 `:set number`):
 
