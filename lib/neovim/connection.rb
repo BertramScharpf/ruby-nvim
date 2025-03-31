@@ -47,9 +47,10 @@ module Neovim
       api_info[ "error_types"].each { |type,info|
         register_error type, info[ "id"]
       }
-      if api_info["version"]["api_level"] >= 13 then
-        @client.define_singleton_method :err_writeln do |msg|
-          call_api :echo, [ [ msg], [ $/]], true, err: true
+      if api_info["version"]["api_level"] < 13 then
+        log :warn, "Using nvim_err_writeln() which is deprecated in since Neovim 0.11.0"
+        @client.define_singleton_method :message_err do |msg|
+          call_api :err_writeln, msg
         end
       end
       nil

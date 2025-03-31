@@ -88,7 +88,7 @@ module Neovim
         else
           line = $@.first[ /:(\d+):in\b/, 1]
         end
-        client.err_writeln "Ruby #{$!.class}:#{line}: #{msg}"
+        client.message_err "Ruby #{$!.class}:#{line}: #{msg}"
       end
     end
 

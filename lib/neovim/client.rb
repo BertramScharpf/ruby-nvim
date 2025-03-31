@@ -102,8 +102,11 @@ module Neovim
 
 
     def message str
-      call_api :out_write, str
-      str.end_with? $/ or call_api :out_write, $/
+      call_api :echo, [ [ str]], true, {}
+    end
+
+    def message_err msg
+      call_api :echo, [ [ msg]], true, err: true
     end
 
 
