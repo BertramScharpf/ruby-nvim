@@ -138,6 +138,7 @@ module Neovim
 
       def stdpath what
         cmd = [ path, "--headless", ]
+        cmd.push "-u", "NONE"
         cmd.push "-c", "echo stdpath(#{what.to_s.inspect})"
         cmd.push "-c", "q"
         (pipe_stderr cmd)&.tap { |x| x.chomp! }
