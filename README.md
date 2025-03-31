@@ -306,9 +306,9 @@ pp $vim.obj_classes.map { |c| [ c.type, ($vim.obj_functions c).sort] }.to_h
 :%ruby |-
 ```
 
-Deprecated functions and old functions not starting with `nvim_` will be
-hidden. The full list of API functions can be obtained by a call to
-`get_api_info`.
+Deprecated functions will be hidden unless you set the environment variable
+`NVIM_RUBY_STRICT=off`. Old functions not starting with `nvim_` will be hidden.
+The full list of API functions can be obtained by a call to `get_api_info`.
 
 ```
 pp $vim.get_api_info
