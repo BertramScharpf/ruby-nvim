@@ -126,17 +126,23 @@ This results in:
 :
 ```
 
-To inhibit the output of the last value, add a minus (`-`) to the
-`:ruby|` call.
+To inhibit the output of the last value, set the
+`$result` variable to `false`.
+
+| $result       | Output                    |
+| ------------- |---------------------------|
+| `nil`         | every result except `nil` |
+| `false`       | nothing                   |
+| `true`        | every result, even `nil`  |
 
 ```
-pp Regexp.constants
+ 1 $result = true
+ 2 puts "hi"
+ 3 #=> nil
 ~
 ~
-:.ruby |-
+:1,2ruby |
 ```
-
-In this case, you may even omit the pipe (`|`) character.
 
 
 #### Last return value
@@ -226,6 +232,8 @@ Then:
 ~
 :5ruby |
 ```
+
+If `$result` is `false`, `$rescue` will be ignored.
 
 Even non-standard errors wil be caught.
 

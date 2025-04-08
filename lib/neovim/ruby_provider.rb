@@ -147,8 +147,7 @@ module Neovim
     # This is called by the +:ruby+ command.
     dsl.rpc :ruby_execute do |client,code,fst,lst|
       code.rstrip!
-      if code =~ /\A\|?(-)?\z/ then  # | is a workaround because Neovim doesn't allow empty code (the ultimate Quine).
-        no_out = $1
+      if code == "|" then  # | is a workaround because Neovim doesn't allow empty code (the ultimate Quine).
         set_globals client, fst..lst do |lines|
           client.command "#{lst}"
           WriteBuf.redirect client do
@@ -156,10 +155,10 @@ module Neovim
               script_binding.eval lines.to_s, "ruby_run"
             rescue Exception
               $@.pop until $@.empty? or $@.last.ends_with? ":in `empty_binding'"
-              raise unless $rescue
+              raise unless $rescue and $result != false
               $!
             end
-            unless no_out or r.nil? then
+            unless $result == false or (not $result and r.nil?) then
               script_binding.local_variable_set :_, r
               puts "#=> #{r.inspect}"
             end
