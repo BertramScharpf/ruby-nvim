@@ -147,8 +147,7 @@ To inhibit the output of the last value, set the
 
 #### Last return value
 
-The anonymous variable `_` will hold the result
-of the last evaluation.
+The anonymous variable `_` will hold the last non-nil result.
 
 ```
  1 7*11*13

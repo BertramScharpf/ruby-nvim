@@ -158,10 +158,8 @@ module Neovim
               raise unless $rescue and $result != false
               $!
             end
-            unless $result == false or (not $result and r.nil?) then
-              script_binding.local_variable_set :_, r
-              puts "#=> #{r.inspect}"
-            end
+            script_binding.local_variable_set :_, r unless r.nil?
+            puts "#=> #{r.inspect}" if $result or ($result.nil? and not r.nil?)
           end
         end
       elsif code == "+" then
