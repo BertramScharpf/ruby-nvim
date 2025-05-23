@@ -12,7 +12,7 @@ module Neovim
 
     def result
       @result or return
-      r = @decs ? (@result.round @decs) : @result
+      r = round @result
       case r
       when BigDecimal then
         r = r.to_s "F"
@@ -100,7 +100,7 @@ module Neovim
     def parse_number n
       n.strip!
       if n =~ %r/ *%\z/ then
-        @prev * (BigDecimal $`) / 100
+        round @prev * (BigDecimal $`) / 100
       else
         comma! if not @sep and n =~ /\d,(?:-|\d+\b(?:[^.]|$))/
         if   @sep == "," then n.gsub! ".", "_" ; n.sub! @sep, "."
@@ -115,6 +115,10 @@ module Neovim
         end
         @decs.nonzero? ? (BigDecimal n) : (Integer n)
       end
+    end
+
+    def round x
+      @decs ? (x.round @decs) : x
     end
 
   end
