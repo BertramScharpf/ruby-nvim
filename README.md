@@ -147,7 +147,7 @@ To inhibit the output of the last value, set the
 
 #### Last return value
 
-The anonymous variable `_` will hold the last non-nil result.
+The anonymous variable `_` will hold the last non-`nil` result.
 
 ```
  1 7*11*13
@@ -281,6 +281,28 @@ The legacy variables `$curbuf` and `$curwin` are supported.
 ~
 ~
 :ruby puts $curbuf.get_name, $curwin.get_height
+```
+
+
+### Visit and changes lines by :rubydo
+
+The `$_` and `$.` variables contain the line itself and the line number.
+`$_` may be changed or assigned to.
+
+```
+:rubydo $_.strip!                                    # unindent all
+:rubydo $_.insert 0, "%4d " % $.                     # number lines
+:rubydo i = i.to_i.succ ; $_ = "%4d %s" % [ i, $_]   # dto.
+```
+
+If `$_` is `nil`, the line will be deleted. If it is an `Enumerable`,
+each element will be inserted as its own line. All other non-string
+values will be converted by `#to_s`.
+
+```
+:rubydo $_ = nil if $_ =~ /^#/       # delete comment lines
+:rubydo $_ = $_.split                # put each word on its own line
+:rubydo $_ = [$_]*3 if ~/knock/i     # triple lines containing /knock/
 ```
 
 
