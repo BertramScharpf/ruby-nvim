@@ -284,7 +284,7 @@ The legacy variables `$curbuf` and `$curwin` are supported.
 ```
 
 
-### Visit and changes lines by :rubydo
+### Visit and change lines by :rubydo
 
 The `$_` and `$.` variables contain the line itself and the line number.
 `$_` may be changed or assigned to.
