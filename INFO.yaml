@@ -3,7 +3,7 @@
 #
 
 nvim:
-  version: "1.12"
+  version: "1.13"
   license: BSD-2-Clause+
   authors:
     - Bertram Scharpf

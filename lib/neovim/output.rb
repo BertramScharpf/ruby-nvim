@@ -137,18 +137,14 @@ module Neovim
   end
 
   class WriteBuf < WriteStd
-    def initialize *args, whole: nil, top: nil
+    def initialize *args, follow: nil
       super
       @lines = []
-      @whole, @top = whole, top
+      @follow = follow.to_bool
     end
     def finish
       super
-      if @whole then
-        @client.buf_set_lines 0, 0, -1, true, @lines
-      else
-        @client.put @lines, "l", true, !@top
-      end
+      @client.put @lines, "l", @follow, @follow
     end
     private
     def write_line l
