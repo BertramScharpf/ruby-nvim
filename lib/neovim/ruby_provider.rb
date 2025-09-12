@@ -150,7 +150,7 @@ module Neovim
       if code == "|" then  # | is a workaround because Neovim doesn't allow empty code (the ultimate Quine).
         set_globals client, fst..lst do |lines|
           client.command "#{lst}"
-          WriteBuf.redirect client do
+          WriteBuf.redirect client, follow: true do
             r = begin
               script_binding.eval lines.to_s, "ruby_run"
             rescue Exception
@@ -165,7 +165,7 @@ module Neovim
       elsif code == "+" then
         client.command "#{lst}"
         set_globals client, fst..lst do |lines|
-          WriteBuf.redirect client do
+          WriteBuf.redirect client, follow: true do
             require "neovim/tools/calculator"
             @calc ||= Calculator.new
             @calc.reset!
