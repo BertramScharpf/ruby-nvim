@@ -86,7 +86,12 @@ module Neovim
         if msg =~ /\A.*?:(\d+):\s*/ then
           line, msg = $1, $'
         else
-          line = $@.first[ /:(\d+):in\b/, 1]
+          $@.each { |b|
+            if b =~ /:(\d+):in\b/ then
+              line = $1.to_i
+              break
+            end
+          }
         end
         client.message_err "Ruby #{$!.class}:#{line}: #{msg}"
       end
@@ -154,7 +159,7 @@ module Neovim
             r = begin
               script_binding.eval lines.to_s, "ruby_run"
             rescue Exception
-              $@.pop until $@.empty? or $@.last.ends_with? ":in `empty_binding'"
+              $@.pop until $@.empty? or $@.last =~ /:\d+:in .*\bempty_binding\W*$/
               raise unless $rescue and $result != false
               $!
             end
