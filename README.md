@@ -303,6 +303,7 @@ values will be converted by `#to_s`.
 :rubydo $_ = nil if $_ =~ /^#/       # delete comment lines
 :rubydo $_ = $_.split                # put each word on its own line
 :rubydo $_ = [$_]*3 if ~/knock/i     # triple lines containing /knock/
+:rubydo $_ = [$_, ""]                # spread by empty lines
 ```
 
 

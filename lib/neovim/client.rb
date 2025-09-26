@@ -165,7 +165,6 @@ module Neovim
         if not String === m or m.hash != h then
           r = result_strings m
           r.flatten!
-          r.each { |l| l.chomp! }
           @client.buf_set_lines @buffer, @i-1, @i, true, r
           @inc = r.length
           @last += @inc-1
@@ -179,7 +178,7 @@ module Neovim
       case obj
       when Enumerable then obj.map { |l| result_strings l }
       when nil        then []
-      else                 obj.to_s.lines
+      else                 obj.to_s.scan /^.*$/
       end
     end
 
