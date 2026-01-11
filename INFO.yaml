@@ -4,7 +4,7 @@
 
 nvim:
   version: "1.13.3"
-  license: BSD-2-Clause+
+  license: LicenseRef-BSD-2-Clause-and-DECENT_LANGUAGE
   authors:
     - Bertram Scharpf
   email: software@bertram-scharpf.de
