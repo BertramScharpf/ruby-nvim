@@ -7,14 +7,14 @@ module Kernel
 
   private
 
+  XSEL_OPTS = { primary: "-p", secondary: "-s", clipboard: "-b", }
+
   def xsel data = nil, sel: :primary
+    XSEL_OPTS.has_key? sel or
+      raise ScriptError, "Sorry, selection must be one of #{XSEL_OPTS.keys.join '/'}."
     if    ($xsel  ||= command? "xsel" ) then
       cmd = [ $xsel]
-      case sel
-      when :primary   then cmd.push "-p"
-      when :secondary then cmd.push "-s"
-      when :clipboard then cmd.push "-b"
-      end
+      cmd.push XSEL_OPTS[ sel]
       ci, co = "-i", "-o"
     elsif ($xclip ||= command? "xclip") then
       cmd = [ $xclip, "-selection", sel.to_s]
