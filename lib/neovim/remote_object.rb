@@ -147,7 +147,7 @@ module Neovim
 
     def []= pos = nil, len = nil, str
       line_indices pos, len do |fst,lst|
-        set_lines fst, lst, false, (str_lines str)
+        set_lines fst, lst, false, (Neovim.result_lines str)
       end
       self
     end
@@ -193,36 +193,60 @@ module Neovim
     include Enumerable
 
     def each pos = nil, len = nil, &block
-      iter_chunks pos, len do |fst,nxt|
-        (get_lines fst, nxt, true).each &block
+      if block_given? then
+        iter_chunks pos, len do |l|
+          l.each &block
+        end
+      else
+        Enumerator.new { |y| each { |x,i| y.yield x, i } }
       end
     end
 
     def map! pos = nil, len = nil, &block
-      iter_chunks pos, len do |fst,nxt|
-        l = (get_lines fst, nxt, true).map &block
-        set_lines fst, nxt, true, l
-      end
-    end
-
-    def select! pos = nil, len = nil, &block
-      line_indices_positive pos, len do |fst,lst|
-        while fst < lst do
-          l, = get_lines fst, fst+1, true
-          if yield l then
-            fst += 1
-          else
-            set_lines fst, fst+1, true, []
-            lst -= 1
+      if block_given? then
+        iter_chunks pos, len do |l|
+          n = l.length
+          m = l.map &block
+          if m != l then
+            r = Neovim.result_lines m
+            set_lines @fst, @fst+n, true, r
+            inc = r.length - n
+            @fst += inc
+            @lst += inc
           end
         end
+      else
+        Enumerator.new { |y| map! { |x,i| y.yield x, i } }
       end
     end
+    alias collect! map!
 
     def reject! pos = nil, len = nil, &block
-      select! pos, len do |l| !yield l end
+      if block_given? then
+        iter_chunks pos, len do |l|
+          n = l.length
+          l.reject! &block
+          if l.length < n then
+            set_lines @fst, @fst+n, true, l
+            inc = l.length - n
+            @fst += inc
+            @lst += inc
+          end
+        end
+      else
+        Enumerator.new { |y| map! { |x,i| y.yield x, i } }
+      end
     end
+    alias delete_if reject!
 
+    def select!
+      if block_given? then
+        reject! { |l| not (yield l) }
+      else
+        Enumerator.new { |y| select! { |l| y.yield l } }
+      end
+    end
+    alias filter! select!
 
     # Don't run into `method_missing`.
     def get_lines fst, lst, strict      ; call_obj :get_lines, fst, lst, strict      ; end
@@ -262,32 +286,22 @@ module Neovim
       end
     end
 
-    @chunk = 1024  # Attention! Each chunk is its own undo level.
+    @chunk_length = 1024
     class <<self
-      attr_accessor :chunk
+      attr_accessor :chunk_length
     end
 
     def iter_chunks pos, len
       line_indices_positive pos, len do |fst,lst|
-        while lst do
-          nxt = fst + self.class.chunk
-          if nxt > lst then
-            nxt, lst = lst, nil
-          end
-          yield fst, nxt
-          fst = nxt
+        @fst, @lst = fst, lst
+        while @fst < @lst do
+          l = get_lines @fst, @fst+self.class.chunk_length, false
+          yield l
+          @fst += self.class.chunk_length
         end
       end
-    end
-
-    def str_lines str
-      if Array === str then
-        str
-      elsif str.nil? then
-        []
-      else
-        str.lines.each { |l| l.chomp! }
-      end
+    ensure
+      @fst = @lst = nil
     end
 
   end
@@ -327,6 +341,19 @@ module Neovim
 
     # There is currently only one tabpage-local option, 'cmdheight'.
     OPTION_PARAM = :tab     # Neovim is missing this.
+
+  end
+
+
+  class <<self
+
+    def result_lines obj
+      case obj
+      when Enumerable then obj.inject [] do |s,l| s.push *(result_lines l) end
+      when nil        then []
+      else                 obj.to_s.scan /^.*$/
+      end
+    end
 
   end
 

@@ -129,11 +129,11 @@ module Neovim
       when Buffer then @client, @buffer = client.client, client.index
       else             @client, @buffer = client,        0
       end
-      @i, @last = range.begin, range.end
+      @first, @last = range.begin, range.end
     end
 
     def to_s
-      (@client.buf_get_lines @buffer, @i-1, @last, true).join $/
+      (@client.buf_get_lines @buffer, @first-1, @last, true).join $/
     end
 
     def method_missing sym, *args, **kwargs, &block
@@ -141,46 +141,64 @@ module Neovim
     end
 
     def each
-      while @i <= @last do
-        @inc = 1
-        l, = @client.buf_get_lines @buffer, @i-1, @i, true
-        yield l
-        @i += @inc
+      if block_given? then
+        begin
+          @i = @first
+          while @i <= @last do
+            l, = @client.buf_get_lines @buffer, @i-1, @i, true
+            yield l, @i
+            @i += 1
+          end
+        ensure
+          @i = nil
+        end
+      else
+        Enumerator.new { |y| each { |l,i| y.yield l, i } }
       end
-    ensure
-      @i = nil
     end
     alias each_line each
 
-    def each_with_no
-      each do |l|
-        yield l, @i
-      end
-    end
-
     def map!
-      each do |l|
-        h = l.hash
-        m = yield l, @i
-        if not String === m or m.hash != h then
-          r = result_strings m
-          r.flatten!
-          @client.buf_set_lines @buffer, @i-1, @i, true, r
-          @inc = r.length
-          @last += @inc-1
+      if block_given? then
+        each do |l|
+          m = yield l, @i
+          if m != l then
+            r = Neovim.result_lines m
+            @client.buf_set_lines @buffer, @i-1, @i, true, r
+            inc = r.length - 1
+            @i    += inc
+            @last += inc
+          end
         end
+      else
+        Enumerator.new { |y| map! { |l,i| y.yield l, i } }
       end
     end
+    alias collect! map!
 
-    private
-
-    def result_strings obj
-      case obj
-      when Enumerable then obj.map { |l| result_strings l }
-      when nil        then []
-      else                 obj.to_s.scan /^.*$/
+    def reject!
+      if block_given? then
+        each do |l|
+          if yield l, @i then
+            @client.buf_set_lines @buffer, @i-1, @i, true, []
+            @i    -= 1
+            @last -= 1
+          end
+        end
+      else
+        Enumerator.new { |y| reject! { |l,i| y.yield l, i } }
       end
     end
+    alias delete_if reject!
+
+    def select!
+      if block_given? then
+        reject! { |l,i| not (yield l, i) }
+      else
+        Enumerator.new { |y| select! { |l,i| y.yield l, i } }
+      end
+    end
+    alias filter! select!
 
   end
 
