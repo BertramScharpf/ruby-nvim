@@ -3,7 +3,7 @@
 #
 
 nvim:
-  version: "1.13.4"
+  version: "1.14"
   license: LicenseRef-BSD-2-Clause-and-DECENT_LANGUAGE
   authors:
     - Bertram Scharpf
