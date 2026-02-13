@@ -310,7 +310,7 @@ values will be converted by `#to_s`.
 ### Requiring Ruby files
 
 In addition to the `:rubyfile` command as documented, that command can also be
-used to just require a Ruby file. Set the name into angle brackets, and the
+used to just require a Ruby file. Put the name into angle brackets, and the
 file will be searched in `$:`. Sorry, file name completion will not work.
 
 ```
