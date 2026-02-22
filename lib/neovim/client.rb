@@ -161,8 +161,9 @@ module Neovim
     def map!
       if block_given? then
         each do |l|
+          h = l.hash
           m = yield l, @i
-          if m != l then
+          if m.hash != h or m != l then
             r = Neovim.result_lines m
             @client.buf_set_lines @buffer, @i-1, @i, true, r
             inc = r.length - 1

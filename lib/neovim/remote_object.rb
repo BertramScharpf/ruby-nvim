@@ -206,8 +206,9 @@ module Neovim
       if block_given? then
         iter_chunks pos, len do |l|
           n = l.length
+          h = l.hash
           m = l.map &block
-          if m != l then
+          if m.hash != h or m != l then
             r = Neovim.result_lines m
             set_lines @fst, @fst+n, true, r
             inc = r.length - n
