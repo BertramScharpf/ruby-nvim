@@ -7,6 +7,7 @@
 begin
   require "supplement"
 rescue LoadError
+  class NilClass ; def nonzero?  ;                      end ; end
   class NilClass ; def notempty? ;                      end ; end
   class String   ; def notempty? ; self unless empty? ; end ; end
   class Array    ; def notempty? ; self unless empty? ; end ; end
@@ -27,18 +28,30 @@ rescue LoadError
     end
   end
   class String
-    def axe n
+    ELLIPSE = :"..."
+    def axe n = 80
       if n < length then
-        e = "..."
-        l = e.length
-        if n > l then
+        l = ELLIPSE.length
+        if n >= l then
           n -= l
         else
-          l = 0
+          n, l = 0, n
         end
-        (slice 0, n) << "..."[0,l]
+        self[ 0, n] << ELLIPSE[0,l]
       else
         self
+      end
+    end
+    def axe! n = 80
+      if n < length then
+        l = ELLIPSE.length
+        if n >= l then
+          n -= l
+        else
+          n, l = 0, n
+        end
+        slice! n...nil
+        self << ELLIPSE[0,l]
       end
     end
     def starts_with? oth ; o = oth.to_str ; o.length          if start_with? o ; end
