@@ -156,15 +156,15 @@ module Neovim
         set_globals client, fst..lst do |lines|
           client.command "#{lst}"
           WriteBuf.redirect client, follow: true do
-            r = begin
-              script_binding.eval lines.to_s, "ruby_run"
-            rescue Exception
-              $@.pop until $@.empty? or $@.last =~ /:\d+:in .*\bempty_binding\W*$/
-              raise unless $rescue and $result != false
-              $!
-            end
-            script_binding.local_variable_set :_, r unless r.nil?
+            r = script_binding.eval lines.to_s, "ruby_run"
             puts "#=> #{r.inspect}" if $result or ($result.nil? and not r.nil?)
+            script_binding.local_variable_set :_, r unless r.nil?
+          rescue Exception
+            $@.pop until $@.empty? or $@.last =~ /:\d+:in .*\bempty_binding\W*$/
+            raise unless $rescue and $result != false
+            puts "#!= #{$!.class}"
+            $!.message.each_line { |l| puts "#!  #{l}" }
+            script_binding.local_variable_set :_, $!
           end
         end
       elsif code == "+" then
