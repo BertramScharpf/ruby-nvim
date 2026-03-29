@@ -225,8 +225,9 @@ Then:
  1 $rescue = true
  2 z = 0
  3 q = 1 / z
- 4 #=> #<ZeroDivisionError: divided by 0>
- 5 puts "=begin", _.backtrace, "=end"
+ 4 #!= ZeroDivisionError
+ 5 #!  divided by 0
+ 6 puts "=begin", _.backtrace, "=end"
 ~
 ~
 :5ruby |
@@ -237,8 +238,8 @@ If `$result` is `false`, `$rescue` will be ignored.
 Even non-standard errors wil be caught.
 
 ```
- 1 def f ; f ; end
- 2 f
+ 1 def fn ; fn ; end
+ 2 fn
 ~
 ~
 :1,2ruby |
@@ -252,6 +253,7 @@ Even non-standard errors wil be caught.
 ~
 :3ruby |
 ```
+
 Then say 'kill 49042' somewhere else.
 
 
