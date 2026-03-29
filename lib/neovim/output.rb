@@ -45,7 +45,7 @@ module Neovim
         i.finish
       end
     end
-    def initialize client, *rest
+    def initialize client, *rest, **kwargs
       @client = client
     end
     def << arg
@@ -90,7 +90,7 @@ module Neovim
         end
       end
     end
-    def initialize *args
+    def initialize *args, **kwargs
       super
       @str = ""
     end
