@@ -137,18 +137,33 @@ module Neovim
   end
 
   class WriteBuf < WriteStd
-    def initialize *args, follow: nil
+    def initialize *args, buffer: nil, follow: true
       super
       @lines = []
+      @buffer = buffer
+      if Integer === @buffer then
+        @buffer = Buffer.new @buffer, @client
+      end
       @follow = follow.to_bool
     end
     def finish
       super
-      @client.put @lines, "l", @follow, @follow
+      if @buffer then
+        r = buffer_is_empty? ? 0..1 : (@follow ? -1..-1 : 0..0)
+        @buffer.set_lines r.begin, r.end, true, @lines
+      else
+        @client.put @lines, "l", @follow, @follow
+      end
     end
     private
     def write_line l
       @lines.push l
+    end
+    def buffer_is_empty?
+      if @buffer.line_count <= 1 then
+        e, = @buffer.get_lines 0, 1, true
+        e.empty?
+      end
     end
   end
 

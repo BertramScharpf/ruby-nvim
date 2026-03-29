@@ -206,6 +206,28 @@ Yet, I suggest not to use `fork` and `exec`, except when
 you're absolutely sure what you're doing.
 
 
+#### Output to a specific buffer
+
+You may specify an output buffer by its number.
+
+```
+ 1 a = 0
+ 2 begin
+ 3   puts a
+ 4   a = (a * 61 + 637) % 1000
+ 5 end while a.nonzero?
+~
+~
+:%ruby @3
+```
+
+Use `:execute` if you determine the buffer number by a function.
+
+```
+:exe "%ruby @".bufnr("#")
+```
+
+
 #### Exception handling
 
 If you prefer, you may return an error as a value, too.

@@ -167,6 +167,12 @@ module Neovim
             script_binding.local_variable_set :_, $!
           end
         end
+      elsif code =~ /\A@(\d+)\z/ then
+        set_globals client, fst..lst do |lines|
+          WriteBuf.redirect client, buffer: $1.to_i, follow: true do
+            script_binding.eval lines.to_s, "ruby_run"
+          end
+        end
       elsif code == "+" then
         client.command "#{lst}"
         set_globals client, fst..lst do |lines|
