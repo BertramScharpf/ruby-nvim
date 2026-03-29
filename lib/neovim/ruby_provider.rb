@@ -23,14 +23,14 @@ module Vim
   class <<Buffer
     def current ; $vim.get_current_buf ; end
     def count   ; $vim.list_bufs.size  ; end
-    def [] i    ; $vim.list_bufs[ i]   ; end
+    def [] i    ; $vim.list_bufs.find { |b| b.index == i } ; end
   end
 
   Window = ::Neovim::Window
   class <<Window
     def current ; $vim.get_current_win                    ; end
     def count   ; $vim.get_current_tabpage.list_wins.size ; end
-    def [] i    ; $vim.get_current_tabpage.list_wins[ i]  ; end
+    def [] i    ; $vim.get_current_tabpage.list_wins.find { |w| w.index == i } ; end
     self
   end
 
