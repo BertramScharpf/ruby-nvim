@@ -18,14 +18,18 @@ end
 
 
 task :clean do
-  rm *GENERATED
+  rm_f *GENERATED
 end
 
 
 def commit
   c = `git rev-parse --short HEAD`
+  $?.success? or raise "Git call failed."
   c.chomp!
   c
+rescue
+  $stderr.puts $!
+  $stderr.puts "Warning: Git commit info could not be determined."
 end
 
 def create_info dst, src
@@ -34,7 +38,7 @@ def create_info dst, src
     m = YAML.load File.read src
     name = m.keys.first
     args = m[ name]
-    args[ :commit] = commit
+    args[ :commit] = commit||"unknown"
     unless args[ :authors] then
       u = args.delete :author
       args[ :authors] = [ u] if u
@@ -54,7 +58,7 @@ task :diffdeps do
   %w(mplight).each { |gem|
     c = `gem contents #{gem}`
     unless $?.success? then
-      puts "Gem #{gem} not installed. Cannot compare."
+      $stderr.puts "Gem #{gem} not installed. Cannot compare."
       next
     end
     (c.split $/).each { |file|

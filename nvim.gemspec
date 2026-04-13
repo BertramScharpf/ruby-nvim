@@ -2,7 +2,7 @@
 #  nvim.gemspec  --  Gem specification
 #
 
-system *%w(rake infofile)
+system *%w(rake clean infofile)
 
 $:.unshift "./lib"
 require "neovim/info"
