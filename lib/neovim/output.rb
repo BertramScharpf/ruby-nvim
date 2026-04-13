@@ -48,6 +48,7 @@ module Neovim
     def initialize client, *rest, **kwargs
       @client = client
     end
+    def tty? ; false ; end
     def << arg
       write arg.to_s
       self
