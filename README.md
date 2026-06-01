@@ -255,6 +255,8 @@ Then:
 :5ruby |
 ```
 
+Set `$rescue` to `:backtrace` to get the full backtrace.
+
 If `$result` is `false`, `$rescue` will be ignored.
 
 Even non-standard errors wil be caught.

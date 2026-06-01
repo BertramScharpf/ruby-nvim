@@ -164,6 +164,7 @@ module Neovim
             raise unless $rescue and $result != false
             puts "#!= #{$!.class}"
             $!.message.each_line { |l| puts "#!  #{l}" }
+            $@.each { |l| puts "#-  #{l}" } if $rescue == :backtrace
             script_binding.local_variable_set :_, $!
           end
         end
