@@ -566,7 +566,7 @@ HexDump /etc/localtime
 
 ## Copyright
 
-  * (C) 2024,2025 Bertram Scharpf <software@bertram-scharpf.de>
+  * (C) 2024-2026 Bertram Scharpf <software@bertram-scharpf.de>
   * License: [BSD-2-Clause+](./LICENSE)
   * Repository: [ruby-nvim](https://github.com/BertramScharpf/ruby-nvim)
 
