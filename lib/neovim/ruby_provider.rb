@@ -174,22 +174,19 @@ module Neovim
             script_binding.eval lines.to_s, "ruby_run"
           end
         end
-      elsif code == "+" then
+      elsif code =~ /\A\+(\S+)?\z/ then
+        require "neovim/tools/summation"
+        nums = Summation.const_get $1 if $1
         client.command "#{lst}"
         set_globals client, fst..lst do |lines|
           WriteBuf.redirect client, follow: true do
-            require "neovim/tools/calculator"
-            @calc ||= Calculator.new
-            @calc.reset!
-            w = 0
-            lines.each { |l|
-              l.length.tap { |g| w = g if g > w }
-              @calc.add l
-            }
-            puts "-"*w
-            puts @calc.result
+            require "neovim/tools/summation"
+            summ = Summation.new nums
+            lines.each { |l| summ.add l }
+            puts summ.sep if summ.count > 1
+            puts summ.result
           rescue
-            puts "Error: #$! (#{$!.class})"
+            puts "#{$!.class}: #$!"
           end
         end
       else

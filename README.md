@@ -377,22 +377,55 @@ See the script `examples/dump_api` for a more elaborated and colorized
 output.
 
 
-### Calculator
+### Summation
 
 Further, a simple number/cash summing tool is included.
 
 ```
-Apples    :     3.99
-Bananas   : 5 * 0.40          # multiplication
-Oranges   :     3.59 - 10%    # percentage added (here subtracted)
-Kiwi      :     0,40          # comma is allowed
-Coconut   :     5,-           # empty decimal places
-# !dot                        # dot forced now
-Tangerines:     4.44
-# !comma                      # result with comma
+1.
+0.5
+0.25
+0.125
+0.0625
 ~
 ~
 :%ruby +
+```
+
+```
+1000
+      5%     # percent of previous value
+      5%     # dto.
+~
+~
+:%ruby +
+```
+
+Monetary values:
+
+```
+Apples    :   3.99
+Bananas   :   0.40           5  # multiplication
+Tangerines:   4.44      70%     # percentage
+Peaches   :   2.00      70%  3  # percentage and multiplication
+Nectarines:   2.00  3   70%     # multiplication and percentage
+Oranges   :   3.59
+                       -10%     # percentage added (here subtracted)
+Kiwi      :   0.40
+Coconut   :   5.00     \19%     # netback
+~
+~
+:%ruby +Commercial
+```
+
+Output of programs like `du -sh *`:
+
+```
+999.9k  # /dir_a
+1.1M    # /dir_b
+~
+~
+:%ruby +Human
 ```
 
 
