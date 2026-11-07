@@ -59,6 +59,10 @@ rescue LoadError
     alias starts_with starts_with?
     alias ends_with   ends_with?
   end
+  class Array
+    def pick  *args, &block ; i = index  *args, &block ; delete_at i if i ; end
+    def rpick *args, &block ; i = rindex *args, &block ; delete_at i if i ; end
+  end
   class Dir ; def entries! ; entries - %w(. ..) ; end ; end
 end
 
