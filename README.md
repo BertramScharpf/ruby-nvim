@@ -132,17 +132,19 @@ To inhibit the output of the last value, set the
 | $result       | Output                    |
 | ------------- |---------------------------|
 | `nil`         | every result except `nil` |
-| `false`       | nothing                   |
 | `true`        | every result, even `nil`  |
+| `false`       | nothing                   |
 
 ```
  1 $result = true
- 2 puts "hi"
- 3 #=> nil
+ 2 "dummy" =~ /x/     # result will be `nil`
 ~
 ~
 :1,2ruby |
 ```
+
+Be aware that the result of `puts` as well is `nil`.
+
 
 
 #### Last return value
@@ -259,7 +261,8 @@ Set `$rescue` to `:backtrace` to get the full backtrace.
 
 If `$result` is `false`, `$rescue` will be ignored.
 
-Even non-standard errors wil be caught.
+Non-standard errors (not descendants of `StandardError`)
+will be caught, too.
 
 ```
  1 def fn ; fn ; end
@@ -278,7 +281,8 @@ Even non-standard errors wil be caught.
 :3ruby |
 ```
 
-Then say 'kill 49042' somewhere else.
+Then say 'kill 49042' somewhere else. Sorry, Neovim doesn't redirect
+the Ctrl-C key to its subprocess.
 
 
 #### Global variables
